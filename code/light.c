@@ -8,21 +8,26 @@
 
 void malloc_light_test()
 {
-    uint32_t volatile * t = (uint32_t *)calloc(65445, sizeof(uint32_t));
-    if (t[100] == 51)
-    {
-        return;
-    }
+    uint8_t volatile * t = (uint8_t *)malloc(65445 * sizeof(uint8_t));
     t[100] = 51;
     free((void*)t);
 }
 
 void stack_light_test()
 {
-    uint32_t volatile t[65445] = {0};
-    if (t[100] == 51)
-    {
-      return;
-    }
+    uint8_t volatile t[65445];
+    t[100] = 51;
+}
+
+void calloc_light_test()
+{
+    uint8_t volatile * t = (uint8_t *)calloc(65445, sizeof(uint8_t));
+    t[100] = 51;
+    free((void*)t);
+}
+
+void stack_initialized_light_test()
+{
+    uint8_t volatile t[65445] = {0};
     t[100] = 51;
 }
