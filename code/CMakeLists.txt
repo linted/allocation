@@ -1,12 +1,12 @@
 
-add_executable(mal ${CMAKE_CURRENT_LIST_DIR}/mal.cpp)
-target_link_libraries(mal benchmark::benchmark)
+set(CXX_FLAGS -Wall -Wextra -O3 -s )
 
-add_executable(sta ${CMAKE_CURRENT_LIST_DIR}/sta.cpp)
-target_link_libraries(sta benchmark::benchmark)
+add_executable(light_usage_test ${CMAKE_CURRENT_LIST_DIR}/light.cpp)
+target_link_libraries(light_usage_test benchmark::benchmark)
+target_compile_options(light_usage_test PUBLIC ${CXX_FLAGS})
 
-add_executable(mal_s ${CMAKE_CURRENT_LIST_DIR}/mal_s.cpp)
-target_link_libraries(mal_s benchmark::benchmark)
 
-add_executable(sta_s ${CMAKE_CURRENT_LIST_DIR}/sta_s.cpp)
-target_link_libraries(sta_s benchmark::benchmark)
+add_executable(sporatic_usage_test ${CMAKE_CURRENT_LIST_DIR}/sporatic.cpp)
+target_link_libraries(sporatic_usage_test benchmark::benchmark)
+target_compile_options(sporatic_usage_test PUBLIC ${CXX_FLAGS})
+
