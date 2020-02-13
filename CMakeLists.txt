@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.5.1)
-project(Allocation)
+project(Allocation C CXX)
 
 add_subdirectory(docs)
 add_subdirectory(deps)
