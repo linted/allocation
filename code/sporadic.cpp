@@ -22,7 +22,7 @@ int setup()
   if(0 > sock)
   {
     std::cout << "Unable to retreive socket" << std::endl;
-    return;
+    return -1;
   }
 
   if (0 != connect(sock, (struct sockaddr *)&host, sizeof(struct sockaddr_in)))
@@ -30,7 +30,7 @@ int setup()
     perror("");
     std::cout << "Unable to connect to server" << std::endl;
     close(sock);
-    return;
+    return -1;
   }
 
   return sock;
@@ -41,6 +41,12 @@ void  do_stack(benchmark::State& state)
 {
   // setup
   int sock = setup();
+  if (-1 == sock)
+  {
+    return;
+  }
+  
+
   for (auto _ : state)
   {
     // code that is timed
@@ -56,6 +62,12 @@ void  do_malloc(benchmark::State& state)
 {
   // setup
   int sock = setup();
+  if (-1 == sock)
+  {
+    return;
+  }
+  
+
   for (auto _ : state)
   {
     // code that is timed
