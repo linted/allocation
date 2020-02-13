@@ -9,17 +9,10 @@
 #include <iostream>
 #include <benchmark/benchmark.h>
 
-void do_malloc(int sock)
+int setup()
 {
-  uint8_t volatile * t = (uint8_t *)calloc(65445, sizeof(uint8_t));
-  recv(sock, (void *)t, 65445, MSG_DONTWAIT);
-  free((void*)t);
-}
 
-void  do_test(benchmark::State& state)
-{
-  // setup
-  struct sockaddr_in host = { 0 };
+  struct sockaddr_in host;
   host.sin_family = AF_INET;
   host.sin_port = htons(4000);
   host.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
@@ -40,10 +33,35 @@ void  do_test(benchmark::State& state)
     return;
   }
 
+  return sock;
+}
+
+
+void  do_stack(benchmark::State& state)
+{
+  // setup
+  int sock = setup();
   for (auto _ : state)
   {
     // code that is timed
-    do_malloc(sock);
+    uint8_t volatile t[65445] = {0};
+    recv(sock, (void*)t, 65445, MSG_DONTWAIT);
+  }
+
+  // cleanup
+  close(sock);
+}
+
+void  do_malloc(benchmark::State& state)
+{
+  // setup
+  int sock = setup();
+  for (auto _ : state)
+  {
+    // code that is timed
+    uint8_t volatile * t = (uint8_t *)calloc(65445, sizeof(uint8_t));
+    recv(sock, (void *)t, 65445, MSG_DONTWAIT);
+    free((void*)t);
   }
 
   // cleanup
@@ -51,8 +69,9 @@ void  do_test(benchmark::State& state)
 
 }
 
-
 // Register the function as a benchmark
-BENCHMARK(do_test);
+BENCHMARK(do_stack);
+// Register the function as a benchmark
+BENCHMARK(do_malloc);
 // Run the benchmark
 BENCHMARK_MAIN();
