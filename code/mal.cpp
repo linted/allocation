@@ -7,12 +7,9 @@
 #include <benchmark/benchmark.h>
 
 
-
 void do_malloc(void)
 {
   uint32_t volatile * t = (uint32_t *)calloc(65445, sizeof(uint32_t));
-  // if (t[100] == 51)
-  //   exit(1);
   t[100] = 51;
   free((void*)t);
 }

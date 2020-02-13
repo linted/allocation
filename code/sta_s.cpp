@@ -13,10 +13,10 @@
 void do_stack(int sock)
 {
   uint8_t volatile t[65445] = {0};
-  recv(sock, t, 65445, MSG_DONTWAIT)
+  recv(sock, (void*)t, 65445, MSG_DONTWAIT);
 }
 
-int main()
+void  do_test(benchmark::State& state)
 {
   struct sockaddr_in host = { 0 };
   host.sin_family = AF_INET;
@@ -47,3 +47,9 @@ int main()
 
   close(sock);
 }
+
+
+// Register the function as a benchmark
+BENCHMARK(do_test);
+// Run the benchmark
+BENCHMARK_MAIN();
