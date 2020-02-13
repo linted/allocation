@@ -7,51 +7,43 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include <iostream>
+#include <benchmark/benchmark.h>
 
-int volatile keep_going = 1;
-int sock = -1;
-
-void signalHandler(int sig)
-{
-  keep_going = 0;
-}
-
-void do_stack(uint64_t * c)
+void do_stack(int sock)
 {
   uint8_t volatile t[65445] = {0};
-  if (0 < recv(sock, t, 65445, MSG_DONTWAIT))
-      (*c)++;
+  recv(sock, t, 65445, MSG_DONTWAIT)
 }
 
 int main()
 {
-  struct sigaction sigactionStruct = {
-        .sa_handler = signalHandler,
-  };
-  sigset_t signals = {0};
+  struct sockaddr_in host = { 0 };
+  host.sin_family = AF_INET;
+  host.sin_port = htons(4000);
+  host.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-  sigaction(SIGINT, &sigactionStruct, NULL);
-
-  struct sockaddr_in host = {
-    .sin_addr.s_addr = htonl(INADDR_LOOPBACK),
-    .sin_family = AF_INET,
-    .sin_port = htons(4000),
-  };
-
+  int sock = -1;
   sock = socket(AF_INET, SOCK_STREAM, 0);
-
-  connect(sock, (struct sockaddr *)&host, sizeof(struct sockaddr_in));
-
-  uint64_t count = 0;
-  while(keep_going)
+  if(0 > sock)
   {
-    do_stack(&count);
-    if(count == UINT64_MAX)
-    {
-      break;
-    }
+    std::cout << "Unable to retreive socket" << std::endl;
+    return;
   }
 
-  printf("%lu\n",count);
-  return 0;
+  if (0 != connect(sock, (struct sockaddr *)&host, sizeof(struct sockaddr_in)))
+  {
+    perror("");
+    std::cout << "Unable to connect to server" << std::endl;
+    close(sock);
+    return;
+  }
+
+  for (auto _ : state)
+  {
+    // code that is timed
+    do_stack(sock);
+  }
+
+  close(sock);
 }
