@@ -40,13 +40,26 @@ int sporadic_setup()
 
 void malloc_sporadic_test(int sock)
 {
-    uint8_t volatile * t = (uint8_t *)calloc(65445, sizeof(uint8_t));
+    uint8_t volatile * t = (uint8_t *)malloc(65445);
     recv(sock, (void *)t, 65445, MSG_DONTWAIT);
     free((void*)t);
 }
 
 
 void stack_sporadic_test(int sock)
+{
+    uint8_t volatile t[65445];
+    recv(sock, (void*)t, 65445, MSG_DONTWAIT);
+}
+
+void calloc_sporadic_test(int sock)
+{
+    uint8_t volatile * t = (uint8_t *)calloc(65445, sizeof(uint8_t));
+    recv(sock, (void *)t, 65445, MSG_DONTWAIT);
+    free((void*)t);
+}
+
+void stack_initalized_sporadic_test(int sock)
 {
     uint8_t volatile t[65445] = {0};
     recv(sock, (void*)t, 65445, MSG_DONTWAIT);
