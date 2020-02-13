@@ -7,7 +7,7 @@ target_compile_options(light_usage_test PUBLIC ${CXX_FLAGS})
 target_include_directories(light_usage_test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-add_executable(sporatic_usage_test ${CMAKE_CURRENT_LIST_DIR}/sporadic.cpp)
+add_executable(sporatic_usage_test ${CMAKE_CURRENT_LIST_DIR}/sporadic.cpp ${CMAKE_CURRENT_LIST_DIR}/sporadic.c)
 target_link_libraries(sporatic_usage_test benchmark::benchmark)
 target_compile_options(sporatic_usage_test PUBLIC ${CXX_FLAGS})
-
+target_include_directories(sporatic_usage_test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
