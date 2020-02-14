@@ -1,45 +1,80 @@
 #include <benchmark/benchmark.h>
 #include "light.h"
 
-void  do_malloc(benchmark::State& state)
+void  do_malloc_large(benchmark::State& state)
 {
   for (auto _ : state)
   {
-    malloc_light_test();
+    malloc_light_large_test();
   }
 }
 
-void do_stack(benchmark::State& state)
+void do_stack_large(benchmark::State& state)
 {
   for (auto _ : state)
   {
-    stack_light_test();
+    stack_light_large_test();
   }
 }
 
-void  do_calloc(benchmark::State& state)
+void  do_calloc_large(benchmark::State& state)
 {
   for (auto _ : state)
   {
-    calloc_light_test();
+    calloc_light_large_test();
   }
 }
 
-void do_stack_initialized(benchmark::State& state)
+void do_stack_initialized_large(benchmark::State& state)
 {
   for (auto _ : state)
   {
-    stack_initialized_light_test();
+    stack_initialized_light_large_test();
   }
 }
 
+void  do_malloc_small(benchmark::State& state)
+{
+  for (auto _ : state)
+  {
+    malloc_light_small_test();
+  }
+}
+
+void do_stack_small(benchmark::State& state)
+{
+  for (auto _ : state)
+  {
+    stack_light_small_test();
+  }
+}
+
+void  do_calloc_small(benchmark::State& state)
+{
+  for (auto _ : state)
+  {
+    calloc_light_small_test();
+  }
+}
+
+void do_stack_initialized_small(benchmark::State& state)
+{
+  for (auto _ : state)
+  {
+    stack_initialized_light_small_test();
+  }
+}
+
+
 // Register the function as a benchmark
-BENCHMARK(do_stack);
+BENCHMARK(do_stack_large);
+BENCHMARK(do_malloc_large);
+BENCHMARK(do_stack_initialized_large);
+BENCHMARK(do_calloc_large);
 // Register the function as a benchmark
-BENCHMARK(do_malloc);
-// Register the function as a benchmark
-BENCHMARK(do_stack_initialized);
-// Register the function as a benchmark
-BENCHMARK(do_calloc);
+BENCHMARK(do_stack_small);
+BENCHMARK(do_malloc_small);
+BENCHMARK(do_stack_initialized_small);
+BENCHMARK(do_calloc_small);
 // Run the benchmark
 BENCHMARK_MAIN();
