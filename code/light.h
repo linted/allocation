@@ -24,6 +24,12 @@ void stack_struct_test();
 void calloc_struct_test();
 void stack_initialized_struct_test();
 
+// recursive tests
+void malloc_recur_test(int volatile count);
+void stack_recur_test(int volatile count);
+void calloc_recur_test(int volatile count);
+void stack_initialized_recur_test(int volatile count);
+
 #ifdef __cplusplus
 }
 #endif

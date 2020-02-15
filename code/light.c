@@ -8,7 +8,7 @@
 #include "light.h"
 
 #define LARGE_BUFFER_SIZE 65445
-#define SMALL_BUFFER_SIZE 64
+#define SMALL_BUFFER_SIZE 16
 // #define STRUCT_TYPE struct sockaddr_in
 
 void __attribute__((optimize("O0"))) do_nothing(volatile void * buff )
@@ -124,4 +124,52 @@ void stack_initialized_struct_test()
         .sin_family = AF_INET,
     };
     do_nothing((void*)&t);
+}
+
+// recur allocations *************************************************
+
+void malloc_recur_test(int volatile count)
+{
+    uint8_t volatile * t = (uint8_t *)malloc(SMALL_BUFFER_SIZE);
+    if (count > 0)
+    {
+        malloc_recur_test(--count);
+    }
+    do_nothing(t);
+    t[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    free((void*)t);
+}
+
+void stack_recur_test(int volatile count)
+{
+    uint8_t volatile t[SMALL_BUFFER_SIZE];
+    if (count > 0)
+    {
+        stack_recur_test(--count);
+    }
+    do_nothing(t);
+    t[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+}
+
+void calloc_recur_test(int volatile count)
+{
+    uint8_t volatile * t = (uint8_t *)calloc(SMALL_BUFFER_SIZE, sizeof(uint8_t));
+    if (count > 0)
+    {
+        calloc_recur_test(--count);
+    }
+    do_nothing(t);
+    t[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    free((void*)t);
+}
+
+void stack_initialized_recur_test(int volatile count)
+{
+    uint8_t volatile t[SMALL_BUFFER_SIZE] = { 0 };
+    if (count > 0)
+    {
+        stack_initialized_recur_test(--count);
+    }
+    do_nothing(t);
+    t[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
 }
