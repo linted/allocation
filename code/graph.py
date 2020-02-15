@@ -61,7 +61,7 @@ def main():
         if debug:
             pyplot.text(0.95, 0.05, 'DEBUG',
                 fontsize=50, color='gray',
-                ha='right', va='center', alpha=0.5)
+                ha='center', va='bottom', alpha=0.5, rotation=20)
 
     pyplot.tight_layout()
     if args.output:
