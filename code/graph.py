@@ -53,7 +53,10 @@ def main():
         pyplot.yticks(y_ticks, labels=['-'.join(x.split('_')[1:-1]) for x in graph_elements.keys()])
         pyplot.xlabel("time in {}".format(results['benchmarks'][0]['time_unit']))
 
-        pyplot.title(args.groups[group])
+        if len(args.groups) == 1:
+            pyplot.title(prog_name)
+        else:
+            pyplot.title(args.groups[group])
 
         if debug:
             pyplot.text(0.95, 0.05, 'DEBUG',
