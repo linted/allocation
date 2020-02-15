@@ -3,11 +3,14 @@ import numpy as np
 from matplotlib import pyplot
 import json
 import argparse
-
+import re
+from math import ceil
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("results_file", help="google benchmark results json output")
+    parser.add_argument('-g',"--groups", help="list of args", nargs='+', default=['.*'])
+    parser.add_argument('-o',"--output", help="output file for the graph")
     args = parser.parse_args()
 
     # print(dir(args))
@@ -29,24 +32,39 @@ def main():
                 }
             benchmarks[test['run_name']][test['aggregate_name']] = test["cpu_time"]
     
-    y_ticks = np.arange(len(benchmarks))
 
-    pyplot.barh(y_ticks,
-        [x['mean'] for x in benchmarks.values()], 
-        xerr=[x['stddev'] for x in benchmarks.values()])
+    for group in range(len(args.groups)):
+        graph_elements = {}
+        for key in benchmarks.keys():
+            if re.search(args.groups[group], key):
+                graph_elements[key] = benchmarks[key]
 
-    pyplot.yticks(y_ticks, labels=[x for x in benchmarks.keys()])
+        y_ticks = np.arange(len(graph_elements))
 
-    pyplot.xlabel("time in {}".format(results['benchmarks'][0]['time_unit']))
+        if len(graph_elements) == 0:
+            continue
 
-    pyplot.title = prog_name
-    if debug:
-        pyplot.text(0.95, 0.05, 'DEBUG',
-            fontsize=50, color='gray',
-            ha='right', va='center', alpha=0.5)
+        # and now plot everythin
+        pyplot.subplot(ceil(len(args.groups)/2), 2, group+1)
+        pyplot.barh(y_ticks,
+            [x['mean'] for x in graph_elements.values()], 
+            xerr=[x['stddev'] for x in graph_elements.values()])
+
+        pyplot.yticks(y_ticks, labels=['-'.join(x.split('_')[1:-1]) for x in graph_elements.keys()])
+        pyplot.xlabel("time in {}".format(results['benchmarks'][0]['time_unit']))
+
+        pyplot.title(args.groups[group])
+
+        if debug:
+            pyplot.text(0.95, 0.05, 'DEBUG',
+                fontsize=50, color='gray',
+                ha='right', va='center', alpha=0.5)
 
     pyplot.tight_layout()
-    pyplot.show()
+    if args.output:
+        pyplot.savefig(args.output)
+    else:
+        pyplot.show()
 
 if __name__ == "__main__":
     main()
