@@ -1,8 +1,6 @@
 #include <benchmark/benchmark.h>
 #include "light.h"
 
-#define multiple_COUNT 10
-
 #define newTest(NAME, FUNC) \
     void NAME(benchmark::State& state) \
     {\
