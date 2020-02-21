@@ -38,29 +38,37 @@ int sporadic_setup()
 }
 
 
-void malloc_sporadic_test(int sock)
+ssize_t malloc_sporadic_test(int sock)
 {
+    ssize_t byteCount = 0;
     uint8_t volatile * t = (uint8_t *)malloc(65445);
-    recv(sock, (void *)t, 65445, MSG_DONTWAIT);
+    byteCount = recv(sock, (void *)t, 65445, MSG_DONTWAIT);
     free((void*)t);
+    return byteCount;
 }
 
 
-void stack_sporadic_test(int sock)
+ssize_t stack_sporadic_test(int sock)
 {
+    ssize_t byteCount = 0;
     uint8_t volatile t[65445];
-    recv(sock, (void*)t, 65445, MSG_DONTWAIT);
+    byteCount = recv(sock, (void*)t, 65445, MSG_DONTWAIT);
+    return byteCount;
 }
 
-void calloc_sporadic_test(int sock)
+ssize_t calloc_sporadic_test(int sock)
 {
+    ssize_t byteCount = 0;
     uint8_t volatile * t = (uint8_t *)calloc(65445, sizeof(uint8_t));
-    recv(sock, (void *)t, 65445, MSG_DONTWAIT);
+    byteCount = recv(sock, (void *)t, 65445, MSG_DONTWAIT);
     free((void*)t);
+    return byteCount;
 }
 
-void stack_initalized_sporadic_test(int sock)
+ssize_t stack_initalized_sporadic_test(int sock)
 {
+    ssize_t byteCount = 0;
     uint8_t volatile t[65445] = {0};
-    recv(sock, (void*)t, 65445, MSG_DONTWAIT);
+    byteCount = recv(sock, (void*)t, 65445, MSG_DONTWAIT);
+    return byteCount;
 }
