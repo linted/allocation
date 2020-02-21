@@ -23,7 +23,7 @@
                 bytes_transferred += tmp;                                                            \
             }                                                                                        \
         }                                                                                            \
-        state.counters["Rate"] = benchmark::Counter(bytes_transferred, benchmark::Counter::kIsRate); \
+        state.SetBytesProcessed(bytes_transferred);\
         /* cleanup */                                                                                \
         close(sock);                                                                                 \
     }
