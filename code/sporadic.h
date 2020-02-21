@@ -13,6 +13,11 @@ ssize_t stack_initialized_network_large_test(int sock);
 ssize_t malloc_network_large_test(int sock);
 ssize_t stack_network_large_test(int sock);
 
+ssize_t calloc_network_medium_test(int sock);
+ssize_t stack_initialized_network_medium_test(int sock);
+ssize_t malloc_network_medium_test(int sock);
+ssize_t stack_network_medium_test(int sock);
+
 ssize_t calloc_network_small_test(int sock);
 ssize_t stack_initialized_network_small_test(int sock);
 ssize_t malloc_network_small_test(int sock);

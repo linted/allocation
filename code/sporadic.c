@@ -16,6 +16,7 @@
 #include "sporadic.h"
 
 #define LARGE_BUFFER 65445
+#define MEDIUM_BUFFER 8192
 #define SMALL_BUFFER 1024
 
 // Network tests *************************************************
@@ -93,6 +94,11 @@ MALLOC_NETWORK_TEST(malloc_network_large_test, LARGE_BUFFER);
 STACK_NETWORK_TEST(stack_network_large_test, LARGE_BUFFER);
 CALLOCK_NETWORK_TEST(calloc_network_large_test, LARGE_BUFFER);
 STACK_INITIALIZED_NETWORK_TEST(stack_initialized_network_large_test, LARGE_BUFFER);
+
+MALLOC_NETWORK_TEST(malloc_network_medium_test, MEDIUM_BUFFER);
+STACK_NETWORK_TEST(stack_network_medium_test, MEDIUM_BUFFER);
+CALLOCK_NETWORK_TEST(calloc_network_medium_test, MEDIUM_BUFFER);
+STACK_INITIALIZED_NETWORK_TEST(stack_initialized_network_medium_test, MEDIUM_BUFFER);
 
 MALLOC_NETWORK_TEST(malloc_network_small_test, SMALL_BUFFER);
 STACK_NETWORK_TEST(stack_network_small_test, SMALL_BUFFER);
