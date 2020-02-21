@@ -126,50 +126,62 @@ void stack_initialized_struct_test()
     do_nothing((void*)&t);
 }
 
-// recur allocations *************************************************
+// multi allocations *************************************************
 
-void malloc_recur_test(int volatile count)
+void malloc_multi_test()
 {
-    uint8_t volatile * t = (uint8_t *)malloc(SMALL_BUFFER_SIZE);
-    if (count > 0)
-    {
-        malloc_recur_test(--count);
-    }
-    do_nothing(t);
-    t[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
-    free((void*)t);
+    uint8_t volatile * t1 = (uint8_t *)malloc(SMALL_BUFFER_SIZE);
+    uint8_t volatile * t2 = (uint8_t *)malloc(SMALL_BUFFER_SIZE);
+    uint8_t volatile * t3 = (uint8_t *)malloc(SMALL_BUFFER_SIZE);
+    do_nothing(t1);
+    do_nothing(t2);
+    do_nothing(t3);
+    t1[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    t2[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    t3[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    free((void*)t1);
+    free((void*)t2);
+    free((void*)t3);
 }
 
-void stack_recur_test(int volatile count)
+void stack_multi_test()
 {
-    uint8_t volatile t[SMALL_BUFFER_SIZE];
-    if (count > 0)
-    {
-        stack_recur_test(--count);
-    }
-    do_nothing(t);
-    t[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    uint8_t volatile t1[SMALL_BUFFER_SIZE];
+    uint8_t volatile t2[SMALL_BUFFER_SIZE];
+    uint8_t volatile t3[SMALL_BUFFER_SIZE];
+    do_nothing(t1);
+    do_nothing(t2);
+    do_nothing(t3);
+    t1[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    t2[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    t3[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
 }
 
-void calloc_recur_test(int volatile count)
+void calloc_multi_test()
 {
-    uint8_t volatile * t = (uint8_t *)calloc(SMALL_BUFFER_SIZE, sizeof(uint8_t));
-    if (count > 0)
-    {
-        calloc_recur_test(--count);
-    }
-    do_nothing(t);
-    t[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
-    free((void*)t);
+    uint8_t volatile * t1 = (uint8_t *)calloc(SMALL_BUFFER_SIZE, sizeof(uint8_t));
+    uint8_t volatile * t2 = (uint8_t *)calloc(SMALL_BUFFER_SIZE, sizeof(uint8_t));
+    uint8_t volatile * t3 = (uint8_t *)calloc(SMALL_BUFFER_SIZE, sizeof(uint8_t));
+    do_nothing(t1);
+    do_nothing(t2);
+    do_nothing(t3);
+    t1[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    t2[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    t3[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    free((void*)t1);
+    free((void*)t2);
+    free((void*)t3);
 }
 
-void stack_initialized_recur_test(int volatile count)
+void stack_initialized_multi_test()
 {
-    uint8_t volatile t[SMALL_BUFFER_SIZE] = { 0 };
-    if (count > 0)
-    {
-        stack_initialized_recur_test(--count);
-    }
-    do_nothing(t);
-    t[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    uint8_t volatile t1[SMALL_BUFFER_SIZE] = { 0 };
+    uint8_t volatile t2[SMALL_BUFFER_SIZE] = { 0 };
+    uint8_t volatile t3[SMALL_BUFFER_SIZE] = { 0 };
+    do_nothing(t1);
+    do_nothing(t2);
+    do_nothing(t3);
+    t1[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    t2[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
+    t3[SMALL_BUFFER_SIZE-1] = (uint8_t)51;
 }

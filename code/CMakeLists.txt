@@ -1,5 +1,5 @@
 
-set(CXX_FLAGS -Wall -Wextra -O3 -s )
+set(CXX_FLAGS -Wall -Wextra -O3 -s -static )
 
 add_executable(light_usage_test ${CMAKE_CURRENT_LIST_DIR}/light.cpp ${CMAKE_CURRENT_SOURCE_DIR}/light.c)
 target_link_libraries(light_usage_test benchmark::benchmark)
