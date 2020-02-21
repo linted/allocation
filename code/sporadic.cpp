@@ -38,12 +38,12 @@ newTest(do_calloc, calloc_sporadic_test);
     
 
 // Register the function as a benchmark
-BENCHMARK(do_stack)->ThreadRange(1,8);
+BENCHMARK(do_stack);
 // Register the function as a benchmark
-BENCHMARK(do_malloc)->ThreadRange(1,8);
+BENCHMARK(do_malloc);
 // Register the function as a benchmark
-BENCHMARK(do_stack_initialized)->ThreadRange(1,8);
+BENCHMARK(do_stack_initialized);
 // Register the function as a benchmark
-BENCHMARK(do_calloc)->ThreadRange(1,8);
+BENCHMARK(do_calloc);
 // Run the benchmark
 BENCHMARK_MAIN();
