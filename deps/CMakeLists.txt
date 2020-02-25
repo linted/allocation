@@ -48,3 +48,16 @@ ExternalProject_Add(
     BUILD_COMMAND make -j ${PROCESSOR_COUNT}
     INSTALL_COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/gperftools/.libs/libtcmalloc.so ${CMAKE_CURRENT_BINARY_DIR}/gperftools/.libs/libtcmalloc_minimal.so ${CMAKE_BINARY_DIR}/bin
 )
+
+# build hoard
+
+ExternalProject_Add(
+    hoard
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/hoard
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/hoard
+    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/hoard/src
+    DOWNLOAD_COMMAND cmake -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/hoard ${CMAKE_CURRENT_BINARY_DIR}/hoard
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND make CXX=${CMAKE_CXX_COMPILER} -j ${PROCESSOR_COUNT}
+    INSTALL_COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/hoard/src/libhoard.so ${CMAKE_BINARY_DIR}/bin
+)
