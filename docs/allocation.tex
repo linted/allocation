@@ -130,8 +130,7 @@ Stack and Heap Allocations: A Cost Comparison
 
 \author{Michael D. Merrill$^{1}$% <-this % stops a space
 \thanks{$^{1}$Michael is a Masters student in Computer Sciences, Georgia Tech,
-and a developer for the 782nd MI BN's CSD-G.
-Email: michael.d.merrill28.civ@mail.mil}%
+and a developer for the }%
 }
 
 
@@ -158,11 +157,17 @@ The source code is publicly available at \url{\GitHubLoc}.
 \section{INTRODUCTION}
 
 Allocation algorithms are designed to limit the overhead related to memory management.
-Namely, to be computationally inexpensive, effective for any allocation size, and to provide discrete blocks of memory. This paper addresses the different costs incurred through the use of the stack and heap across their various allocation methods. Costs measured include performance, flexibility, and code complexity.
+The most common design goals include considerations for computational expenses, effectiveness allocation size, and to provide discrete blocks of memory. 
+Stack allocation on commonly used architectures, such as Intel x86, involve changing the value of a register to allocate additional space, and are thus standardized by the architecture.
+Dynamic allocation, in contrast, is defined by userspace libraries.
+This allows for multiple implementations of allocators, as well as specialized allocators which offer increased performance benefits for their use cases. 
 
-A number of test algorithms will be used as measurements. Each will attempt to measure a discrete feature and function common to all allocation algorithms. Care is taken to ensure that tests do not favor one method over another through intentional use of compiler hints and directives. Each test algorithm is designed to mimic common, real world use cases of allocated memory. 
+This paper addresses the performance costs incurred through the use of the stack and heap across their various allocation methods. 
+A number of test algorithms will be used as measurements. 
+Each will attempt to measure a discrete feature and function common to all allocation algorithms. 
+Care is taken to ensure that tests do not favor one method over another through intentional use of compiler hints and directives. 
+The test algorithms are designed to mimic common, real world use cases of allocated memory as well as the academic and theoretical maximums of each allocation type. 
 
-GCC is used to compile the test algorithms \todo.
 
 % \begin{figure}[tbp]
 % \centering
@@ -182,150 +187,63 @@ Allocation with Light Usage Algorithm captures the use case of a
 \begin{algorithm}[h]
 \caption{Allocation with Light Usage}
 \begin{algorithmic}
-\STATE let $T$ be the total number of successful iterations
-\STATE let $0 < S$ be the number of bytes allocated
-\STATE let $0 \leq R \leq S$ a random index to test
-\STATE let $0 < C$
-\WHILE{Test is not finished}
+% \STATE let $T$ be the total number of successful iterations
+% \STATE let $0 < S$ be the number of bytes allocated
+% \STATE let $0 \leq R \leq S$ a random index to test
+% \STATE let $0 < C$
+\WHILE{test is not finished}
   \STATE $M \leftarrow allocate(S)$
-  \IF{$M_\text{R} \neq C $}
+  % \IF{$M_\text{R} \neq C $}
   \STATE $M_\text{R} \leftarrow C$
-  \STATE $C \leftarrow C + 1$
+  \STATE $T \leftarrow T + 1$
 %   \ELSE\STATE $C$
-  \ENDIF
+  % \ENDIF
   \STATE $deallocate(M)$
 \ENDWHILE
 \end{algorithmic}
 \label{light_usage_algorithm}
 \end{algorithm}
 
-% Rather than allowing loss spikes to destabilize learning, ALRC applies the mapping $\eta L \rightarrow \text{stop\_gradient}(L_\text{max}/L) \eta L$ if $L > L_\text{max}$. The function $\text{stop\_gradient}$ leaves its operand unchanged in the forward pass and blocks gradients in the backwards pass. ALRC adapts the learning rate to limit the effective loss being backpropagated to $L_\text{max}$. The value of $L_\text{max}$ is non-trivial for ALRC to complement existing learning algorithms. In addition to training stability and robustness to hyperparameter choices, $L_\text{max}$ needs to adapt to losses and learning rates as they vary. 
+\begin{algorithm}[h]
+  \caption{Allocation and Initialization of Data Structure}
+  \begin{algorithmic}
+    \WHILE{test is not finished}
+      \STATE $M \leftarrow allocate(S)$
+      \STATE $M_\text{R1} \leftarrow C$
+      \STATE $M_\text{R2} \leftarrow C$
+      \STATE $M_\text{R3} \leftarrow C$
+      \STATE $T \leftarrow T + 1$
+      \STATE $deallocate(M)$
+    \ENDWHILE
+  \end{algorithmic}
+  \label{struct_usage_algorithm}
+\end{algorithm}
 
-% In our implementation, $L_\text{max}$ is a number of standard deviations of the loss above its mean and requires five hyperparameters. There are two decay rates, $\beta_1$ and $\beta_2$, for exponential moving averages used to estimate the mean and standard deviation of the loss and a number, $n$, of standard deviations. Similar to batch normalization\cite{ioffe2015batch}, any decay rate close to 1 is effective e.g. $\beta_1 = \beta_2 = 0.999$. Performance does vary slightly with $n$; however, we find that any $n \approx 3$ is effective. Initial values for the running means, $\mu_1$ and $\mu_2$, where $\mu_1^2 < \mu_2$ also have to be provided. However, any sensible initial estimates larger than their true values are fine as $\mu_1$ and $\mu_2$ will decay to their correct values.
-
-% ALRC can be extended to any loss function or batch size. For batch sizes above 1, we apply ALRC to individual losses, while $\mu_1$ and $\mu_2$ are updated with mean losses. ARLC can also be applied to loss summands; such as per pixel errors between generated and reference images, while $\mu_1$ and $\mu_2$ are updated with the mean errors.
+\begin{algorithm}[h]
+  \caption{Allocation with Network Usage}
+  \begin{algorithmic}
+    \STATE $C \leftarrow open()$
+    \WHILE{test is not finished}
+      \STATE $M \leftarrow allocate(S)$
+      % \IF{$M_\text{R} \neq C $}
+      \STATE $M_\text{R} \leftarrow read(C)$
+      \STATE $T \leftarrow T + 1$
+      % \ELSE\STATE $C$
+      % \ENDIF
+      \STATE $deallocate(M)$
+    \ENDWHILE
+  \end{algorithmic}
+  \label{network_usage_algorithm}
+\end{algorithm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experiments: CIFAR-10 Supersampling}
+\section{Experiments: Algorithm \ref{light_usage_algorithm}}
 
-% To invistagate the ability of ALRC to stabilize learning and its robustness to hyperperameter choices, we performed a series of toy experiments with networks trained to upsample CIFAR-10\cite{krizhevsky2014cifar, krizhevsky2009learning} images to 32$\times$32$\times$3 after downsampling to 16$\times$16$\times$3.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Experiments: Algorithm \ref{struct_usage_algorithm}}
 
-% \vspace{\extraspace}
-% \noindent\textbf{Data pipeline:} In order, images were randomly flipped left or right, had their brightness altered, had their contrast altered, were linearly transformed to have zero mean and unit variance and bilinearly downsampled to 16$\times$16$\times$3.
-
-% \begin{figure}[tbh!]
-% \centering
-% \includegraphics[width=0.57\columnwidth]{alrc_architecture.png}
-% \caption{ Convolutional image 2$\times$ supersampling network with three skip-2 residual blocks. }
-% \label{alrc_architecture}
-% \end{figure}
-
-% \vspace{\extraspace}
-% \noindent\textbf{Architecture:} Images were upsampled and passed through the convolutional network in fig.~\ref{alrc_architecture}. Each convolutional layer is followed by ReLU\cite{nair2010rectified} activation, except the last. 
-
-% \vspace{\extraspace}
-% \noindent\textbf{Initialization:} All weights were Xavier\cite{glorot2010understanding} initialized. Biases were zero initialized.
-
-% \vspace{\extraspace}
-% \noindent\textbf{Learning policy:} ADAM optimization was used with the hyperparameters recommended in \cite{kingma2014adam} and a base learning rate of 1/1280 for 100000 iterations. The learning rate was constant in batch size 1, 4, 16 experiments and decreased to 1/12800 after 54687 iterations in batch size 64 experiments. Networks were trained to minimize mean squared or quartic errors between restored and ground truth images. ALRC was applied to limit the magnitudes of losses to either 2, 3, 4 or $\infty$ standard deviations above their running means. For batch sizes above 1, ALRC was applied to each loss individually.
-
-% \begin{figure*}[tbh!]
-% \vspace{0.7cm}
-% {\centering
-% \includegraphics[width=\textwidth]{alrc.png}
-% \caption{ Unclipped learning curves for 2$\times$ CIFAR-10 upsampling with batch sizes 1, 4, 16 and 64 with and without adaptive learning rate clipping of losses to 3 standard deviations above their running means. Training is more stable for squared errors than quartic errors. Learning curves are 500 iteration boxcar averaged. }
-% \label{fig:alrc}}
-% \footnotesize
-% \vspace{\baselineskip}
-% Squared Errors\\
-% \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}c|cccccccc}
-% \hline
-% \multicolumn{1}{c|}{}       & \multicolumn{2}{c}{Batch Size 1} & \multicolumn{2}{c}{Batch Size 4} & \multicolumn{2}{c}{Batch Size 16} & \multicolumn{2}{c}{Batch Size 64} \\
-% Threshold & Mean         & \multicolumn{1}{c}{Std Dev}      & Mean       & Std Dev      & Mean       & \multicolumn{1}{c}{Std Dev}       & Mean      & Std Dev      \\ \hline
-% 2 & 5.55 & 0.048 & 4.96 & 0.016 & 4.58 & 0.010 & - & - \\
-% 3 & 5.52 & 0.054 & 4.96 & 0.029 & 4.58 & 0.004 & 3.90 & 0.013 \\
-% 4 & 5.56 & 0.048 & 4.97 & 0.017 & 4.58 & 0.007 & 3.89 & 0.016 \\
-% $\infty$ & 5.55 & 0.041 & 4.98 & 0.017 & 4.59 & 0.006 & 3.89 & 0.014 \\
-% \hline
-% \end{tabular*}
-% \vspace{\baselineskip}
-
-% Quartic Errors\\
-% \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}c|cccccccc}
-% \hline
-% \multicolumn{1}{c|}{}       & \multicolumn{2}{c}{Batch Size 1} & \multicolumn{2}{c}{Batch Size 4} & \multicolumn{2}{c}{Batch Size 16} & \multicolumn{2}{c}{Batch Size 64} \\
-% Threshold & Mean         & \multicolumn{1}{c}{Std Dev}      & Mean       & Std Dev      & Mean       & \multicolumn{1}{c}{Std Dev}       & Mean      & Std Dev      \\ \hline
-% 2 & 3.54 & 0.084 & 3.02 & 0.023 & 2.60 & 0.012 & 1.65 & 0.011 \\
-% 3 & 3.59 & 0.055 & 3.08 & 0.024 & 2.61 & 0.014 & 1.58 & 0.016 \\
-% 4 & 3.61 & 0.054 & 3.13 & 0.023 & 2.64 & 0.016 & 1.57 & 0.016 \\
-% $\infty$ & 3.88 & 0.108 & 3.32 & 0.037 & 2.74 & 0.020 & 1.61 & 0.008 \\
-% \hline
-% \end{tabular*}
-% \captionof{table}{ Adaptive learning rate clipping (ALRC) for losses 2, 3, 4 and $\infty$ running standard deviations above their running means for batch sizes 1, 4, 16 and 64. ARLC was not applied for clipping at $\infty$. Each squared and quartic error mean and standard deviation is for the means of the final 5000 training errors of 10 experiments. ALRC lowers errors for unstable quartic error training at low batch sizes and otherwise has little effect. Means and standard deviations are multiplied by 100. }
-% \label{table:alrc}
-% % \vspace{0.3cm}
-% \end{figure*}
-
-% \vspace{\extraspace}
-% \noindent\textbf{Results:} Example learning curves for mean squared and quartic error training are shown in fig.~\ref{fig:alrc}. Training is more stable and converges to lower losses for larger batch sizes. Training is less stable for quartic errors than squared errors, allowing ALRC to be examined for loss functions with different stability.
-
-% Training was repeated 10 times for each combination of ALRC threshold and batch size. Means and standard deviations of the means of the last 5000 training losses for each experiment are tabulated in table~\ref{table:alrc}. ALRC has no effect on mean squared error (MSE) training, even for batch size 1. However, it decreases errors for batch sizes 1, 4 and 16 for mean quartic error training.
-
-% \FloatBarrier
-% \discardpagesfromhere
-% \clearpage
-% \keeppagesfromhere
-
-% \begin{figure*}[tbh]
-% \centering
-% \includegraphics[width=0.93\textwidth]{alrc_example.png}
-% \caption{ Neural network completions of 512$\times$512 scanning transmission electron microscopy images from 1/20 coverage blurred spiral scans. }
-% \label{alrc_example}
-% \end{figure*}
-
-% \section{Experiments: Partial-STEM}
-
-% To test ALRC in practice, we applied our algorithm to neural networks learning to complete 512$\times$512 scanning transmission electron microscopy (STEM) images from partial scans with 1/20 coverage. Example completions are shown in fig.~\ref{alrc_example}.
-
-% \begin{figure*}[tbp!]
-% \vspace{1.5cm}
-% \centering
-% \includegraphics[width=0.97\textwidth]{gen-2-step.png}
-% \caption{ Two-stage generator that completes 512$\times$512 micrographs from partial scans. A dashed line indicates that the same image is input to the inner and outer generator. Large scale features developed by the inner generator are locally enhanced by the outer generator and turned into images. An auxiliary inner generator trainer restores images from inner generator features to provide direct feedback. }
-% \label{gen-2-step}
-% \vspace{1.5cm}
-% \end{figure*}
-
-
-% \vspace{\extraspace}
-% \noindent\textbf{Data pipeline:} In order, each image was subject to a random combination of flips and 90$\degree$ rotations to augment the dataset by a factor of 8. Next, each STEM images was blurred and a path described by a 1/20 coverage spiral was selected. Finally, artificial noise was added to scans to make them more difficult to complete.
-
-% \vspace{\extraspace}
-% \noindent\textbf{Architecture:} Our network can be divided into the three subnetworks shown in fig.~\ref{gen-2-step}: an inner generator, outer generator and an auxiliary inner generator trainer. The auxiliary trainer\cite{szegedy2014going, szegedy2015rethinking} is introduced to provide a more direct path for gradients to backpropagate to the inner generator. Each convolutional layer is followed by ReLU activation, except the last.
-
-% \vspace{\extraspace}
-% \noindent\textbf{Initialization:} Weights were initialized from a normal distribution with mean 0.00 and standard deviation 0.05. There are no biases.
-
-% \vspace{\extraspace}
-% \noindent\textbf{Weight normalization:} All generator weights are weight normalized\cite{salimans2016weight} and a weight normalization initialization pass was performed after weight initialization. Following \cite{salimans2016weight, hoffer2018norm}, running mean-only batch normalization was applied to the output channels of every convolutional layer except the last. Channel means were tracked by exponential moving averages with decay rates of 0.99. Similar to \cite{chen2017rethinking}, running mean-only batch normalization was frozen in the second half of training to improve stability.
-
-% \vspace{\extraspace}
-% \noindent\textbf{Loss functions:} The auxiliary inner generator trainer learns to generate half-size completions that minimize MSEs from half-size blurred ground truth STEM images. Meanwhile, the outer generator learns to produce full-size completions that minimize MSEs from blurred STEM images. All MSEs were multipled by 200. The inner generator cooperates with the auxiliary inner generator trainer and outer generator. 
-
-% To benchmark ALRC, we investigated training with MSEs, Huberized ($h=1$) MSEs, MSEs with ALRC and Huberized ($h=1$) MSEs with ALRC before Huberization. Training with both ALRC and Hubarization showcases the ability of ALRC to complement another loss function modification.
-
-% \vspace{\extraspace}
-% \noindent\textbf{Learning policy:} ADAM optimization\cite{kingma2014adam} was used with a constant generator learning rate of 0.0003 and a first moment of the momentum decay rate, $\beta_1=0.9$, for 250000 iterations. In the next 250000 iterations, the learning rate and $\beta_1$ were linearly decayed in eight steps to zero and 0.5, respectively. The learning rate for the auxiliary inner generator trainer was two times the generator learning rate; $\beta_1$ were the same. All training was performed with batch size 1 due to the large model size needed to complete 512$\times$512 scans.
-
-% \begin{figure}[htbp]
-% \centering
-% \includegraphics[width=0.97\columnwidth]{stability.png}
-% \caption{ Outer generator losses show that ALRC and Huberization stabilize learning. ALRC lowers final mean squared error (MSE) and Huberized MSE losses and accelerates convergence. Learning curves are 2500 iteration boxcar averaged. }
-% \label{stability}
-% \end{figure}
-
-% \vspace{\extraspace}
-% \noindent\textbf{Results:} Outer generator losses in fig.~\ref{stability} show that ALRC and Huberization stabilize learning. Further, ALRC accelerates MSE and Huberized MSE convergence to lower losses. To be clear, learning policy was optimized for MSE training so direct loss comparison is uncharitable to ALRC.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Experiments: Algorithm \ref{network_usage_algorithm}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
@@ -353,12 +271,12 @@ Source code for all experiments detailed in this paper can be found at \url{\Git
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\bibliographystyle{ieeetr}
-\bibliography{bibliography}
+% \bibliographystyle{ieeetr}
+% \bibliography{bibliography}
 
 \section{Acknowledgements}
 
-\noindent This research was funded by 782nd MI BN.
+\noindent This research was funded by .
 
 \clearpage
 
