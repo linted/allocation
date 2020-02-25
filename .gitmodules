@@ -10,3 +10,6 @@
 [submodule "deps/gperftools"]
 	path = deps/gperftools
 	url = git@github.com:gperftools/gperftools.git
+[submodule "deps/hoard"]
+	path = deps/hoard
+	url = git@github.com:emeryberger/Hoard.git
