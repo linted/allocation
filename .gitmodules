@@ -7,6 +7,3 @@
 [submodule "deps/jemalloc"]
 	path = deps/jemalloc
 	url = git@github.com:jemalloc/jemalloc.git
-[submodule "deps/nedmalloc"]
-	path = deps/nedmalloc
-	url = git@github.com:ned14/nedmalloc.git
