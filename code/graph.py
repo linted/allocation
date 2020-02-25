@@ -28,9 +28,9 @@ def main():
                 benchmarks[test['run_name']] = {
                     'mean':None, 
                     'median':None, 
-                    'stddev':None
+                    'stddev':None,
                 }
-            benchmarks[test['run_name']][test['aggregate_name']] = test["cpu_time"]
+            benchmarks[test['run_name']][test['aggregate_name']] = test.get("bytes_per_second", test.get("cpu_time", None))
     
 
     for group in range(len(args.groups)):
@@ -51,7 +51,9 @@ def main():
             xerr=[x['stddev'] for x in graph_elements.values()])
 
         pyplot.yticks(y_ticks, labels=['-'.join(x.split('_')[1:-1]) for x in graph_elements.keys()])
-        pyplot.xlabel("time in {}".format(results['benchmarks'][0]['time_unit']))
+
+        xAxis = "Bytes per second" if results['benchmarks'][0].get("bytes_per_second", False) else "time in {}".format(results['benchmarks'][0]['time_unit'])
+        pyplot.xlabel(xAxis)
 
         if len(args.groups) == 1:
             pyplot.title(prog_name)
