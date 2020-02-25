@@ -180,9 +180,11 @@ The test algorithms are designed to mimic common, real world use cases of alloca
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Algorithms}
 
-Allocation with Light Usage Algorithm captures the use case of a 
-
-% Adaptive learning rate clipping (ALRC, algorithm~\ref{alrc_algorithm}) is designed to addresses the limitations of gradient clipping. Namely, to be computationally inexpensive, effective for any batch size, robust to hyperparameter choices and to preserve backpropagated gradient distributions. Like gradient clipping, it also has to be applicable to arbitrary loss funtions and neural network architectures.  
+Algorithm \ref{light_usage_algorithm} is designed to test the baseline performance of the allocator.
+Memory is allocated and stored in the variable $M$.
+A constant value $C$ is then stored at an arbitrary location within the allocated memory, $M_\text{R}$.
+Finally, a counter, $T$, is incremented to keep track of the number of iterations, and the memory is deallocated.
+This is continued until the test is finished; a time determined by the experiment implementation.
 
 \begin{algorithm}[h]
 \caption{Allocation with Light Usage}
@@ -204,6 +206,8 @@ Allocation with Light Usage Algorithm captures the use case of a
 \label{light_usage_algorithm}
 \end{algorithm}
 
+Similar to the previos algorithm, Algorithm \ref{}
+
 \begin{algorithm}[h]
   \caption{Allocation and Initialization of Data Structure}
   \begin{algorithmic}
@@ -219,22 +223,36 @@ Allocation with Light Usage Algorithm captures the use case of a
   \label{struct_usage_algorithm}
 \end{algorithm}
 
+\todo And this algorithm
+
 \begin{algorithm}[h]
   \caption{Allocation with Network Usage}
   \begin{algorithmic}
     \STATE $C \leftarrow open()$
     \WHILE{test is not finished}
       \STATE $M \leftarrow allocate(S)$
-      % \IF{$M_\text{R} \neq C $}
       \STATE $M_\text{R} \leftarrow read(C)$
       \STATE $T \leftarrow T + 1$
-      % \ELSE\STATE $C$
-      % \ENDIF
       \STATE $deallocate(M)$
     \ENDWHILE
   \end{algorithmic}
   \label{network_usage_algorithm}
 \end{algorithm}
+
+\todo closing notes about algorithms?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Experiment Methodologies}
+Googles open source Benchmark library is a microbenchmark framework developed using the Google Test suite. Benchmark provides a comprehensive environment to gauge code snippet performance with an independent and repeatable approach.
+Each benchmark handler is written in \textbf{C++} and handles the test setup and teardown functionality.
+The portion of code that is timed is written in \textbf{C} to minimize overhead associated with higher level languages, and to produce binary output which is verifiably identical to the associated algorithms.
+
+A standardized set of tests were devised for each algorithm to measure the differences between uninitialized stack allocations, malloc, initializated stack allocation, and calloc.
+Each item in this set of tests were chosen to provide an equal and full comparison between the most common types of allocations.
+The set of tests can thus be divided into two groups, initialized and uninitialized allocations.
+Care is taken when discussing results to ensure comparisons are conducted between groups or between members of groups to more accurately portray results in real world usage. 
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiments: Algorithm \ref{light_usage_algorithm}}
