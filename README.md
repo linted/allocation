@@ -1,11 +1,26 @@
 # Allocation benchmarks
 This is research into allocation types and how efficient they are in different scenarios.
 
+## dependencies
+The following programs are required to build this project
+
+- gcc (or equivalent)
+- g++ (or equivalent)
+- cmake
+- git
+- texlive (may require texlive-full)
+
+
 ## Build
 ```
+git submodule update --init --recursive
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release && make -j8
+```
+turn off building of docs by running
+```
+cmake .. -DCMAKE_BUILD_TYPE=Release -DNO_DOCS=true && make -j8
 ```
 
 ## Run
