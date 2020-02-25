@@ -12,7 +12,6 @@ add_subdirectory(benchmark EXCLUDE_FROM_ALL)
 
 # build jemalloc
 
-
 ExternalProject_Add(
     jemalloc 
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/jemalloc
@@ -35,4 +34,17 @@ ExternalProject_Add(
     CONFIGURE_COMMAND cmake -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/ptmalloc ${CMAKE_CURRENT_BINARY_DIR}/ptmalloc
     BUILD_COMMAND make linux-shared -j ${PROCESSOR_COUNT}
     INSTALL_COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/ptmalloc/libptmalloc3.so ${CMAKE_BINARY_DIR}/bin
+)
+
+# build tcmalloc
+
+ExternalProject_Add(
+    tcmalloc 
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gperftools
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gperftools
+    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/gperftools
+    DOWNLOAD_COMMAND cmake -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/gperftools ${CMAKE_CURRENT_BINARY_DIR}/gperftools
+    CONFIGURE_COMMAND pwd && ./autogen.sh --prefix=${CMAKE_CURRENT_BINARY_DIR} && ./configure
+    BUILD_COMMAND make -j ${PROCESSOR_COUNT}
+    INSTALL_COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/gperftools/.libs/libtcmalloc.so ${CMAKE_CURRENT_BINARY_DIR}/gperftools/.libs/libtcmalloc_minimal.so ${CMAKE_BINARY_DIR}/bin
 )
