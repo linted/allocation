@@ -181,9 +181,9 @@ The test algorithms are designed to mimic common, real world use cases of alloca
 \section{Algorithms}
 
 Algorithm \ref{light_usage_algorithm} is designed to test the baseline performance of the allocator.
-Memory is allocated and stored in the variable $M$.
+Memory of size $S$ is allocated and stored in the variable $M$.
 A constant value $C$ is then stored at an arbitrary location within the allocated memory, $M_\text{R}$.
-Finally, a counter, $T$, is incremented to keep track of the number of iterations, and the memory is deallocated.
+Finally, the memory is deallocated and released to be used by the next iteration or another part of the overall program.
 This is continued until the test is finished; a time determined by the experiment implementation.
 
 \begin{algorithm}[h]
@@ -197,7 +197,7 @@ This is continued until the test is finished; a time determined by the experimen
   \STATE $M \leftarrow allocate(S)$
   % \IF{$M_\text{R} \neq C $}
   \STATE $M_\text{R} \leftarrow C$
-  \STATE $T \leftarrow T + 1$
+  % \STATE $T \leftarrow T + 1$
 %   \ELSE\STATE $C$
   % \ENDIF
   \STATE $deallocate(M)$
@@ -206,7 +206,11 @@ This is continued until the test is finished; a time determined by the experimen
 \label{light_usage_algorithm}
 \end{algorithm}
 
-Similar to the previos algorithm, Algorithm \ref{}
+Algorithm \ref{struct_usage_algorithm}, in a method similar to algorithm \ref{light_usage_algorithm}, begins by allocating memory and storing it into $M$.
+In this case $M$ is considered to be a \textbf{C} style structure or similar object of size $S$. 
+All of the members within $M$ are filled with appropriate data, simulating common usage of low level structures.
+After the structure is populated, the deallocation method is used to free the memory.
+Once again, the algorithm loops until a stop condition is met.
 
 \begin{algorithm}[h]
   \caption{Allocation and Initialization of Data Structure}
@@ -216,14 +220,19 @@ Similar to the previos algorithm, Algorithm \ref{}
       \STATE $M_\text{R1} \leftarrow C$
       \STATE $M_\text{R2} \leftarrow C$
       \STATE $M_\text{R3} \leftarrow C$
-      \STATE $T \leftarrow T + 1$
+      % \STATE $T \leftarrow T + 1$
       \STATE $deallocate(M)$
     \ENDWHILE
   \end{algorithmic}
   \label{struct_usage_algorithm}
 \end{algorithm}
 
-\todo And this algorithm
+One of the most common usages of allocated memory is in network operations, which Algorithm \ref{network_usage_algorithm}, attempts to capture.
+In a setup phase, prior to starting the benchmarked portion, a connection to a server is established.
+During the benchmark loop, memory of size $S$ is allocated and stored in $M$.
+Up to $C$ bytes are read from the server into the allocated memory at $M$.
+After reading is complete, $M$ is deallocated.
+The loop continues until the test is finished, and the socket is closed.
 
 \begin{algorithm}[h]
   \caption{Allocation with Network Usage}
@@ -232,9 +241,10 @@ Similar to the previos algorithm, Algorithm \ref{}
     \WHILE{test is not finished}
       \STATE $M \leftarrow allocate(S)$
       \STATE $M_\text{R} \leftarrow read(C)$
-      \STATE $T \leftarrow T + 1$
+      % \STATE $T \leftarrow T + 1$
       \STATE $deallocate(M)$
     \ENDWHILE
+    \STATE $close(C)$
   \end{algorithmic}
   \label{network_usage_algorithm}
 \end{algorithm}
