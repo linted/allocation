@@ -253,15 +253,14 @@ The loop continues until the test is finished, and the socket is closed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment Methodologies}
-Googles open source Benchmark library is a microbenchmark framework developed using the Google Test suite. Benchmark provides a comprehensive environment to gauge code snippet performance with an independent and repeatable approach.
+Google's open source Benchmark library is a `microbenchmark' framework developed using the Google Test suite. Benchmark provides a comprehensive environment to gauge code snippet performance with an independent and repeatable approach.
 Each benchmark handler is written in \textbf{C++} and handles the test setup and teardown functionality.
-The portion of code that is timed is written in \textbf{C} to minimize overhead associated with higher level languages, and to produce binary output which is verifiably identical to the associated algorithms.
+The portion of code which is being evaluated is written in \textbf{C} to minimize overhead associated with higher level languages, and to produce binary output which is verifiably identical to the associated algorithms.
 
 A standardized set of tests were devised for each algorithm to measure the differences between uninitialized stack allocations, malloc, initializated stack allocation, and calloc.
-Each item in this set of tests were chosen to provide an equal and full comparison between the most common types of allocations.
+Each item in this set was chosen to provide an equal and full comparison between the most common types of allocations.
 The set of tests can thus be divided into two groups, initialized and uninitialized allocations.
-Care is taken when discussing results to ensure comparisons are conducted between groups or between members of groups to more accurately portray results in real world usage. 
-
+Care is taken when discussing test results to ensure comparisons are conducted only between groups or individual members of a group to more accurately portray results of real world usage. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
