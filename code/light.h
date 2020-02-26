@@ -6,11 +6,23 @@ extern "C"
 { 
 #endif
 
+// Exta Large buffer tests
+void malloc_light_xlarge_test();
+void stack_light_xlarge_test();
+void calloc_light_xlarge_test();
+void stack_initialized_light_xlarge_test();
+
 // Large buffer tests
 void malloc_light_large_test();
 void stack_light_large_test();
 void calloc_light_large_test();
 void stack_initialized_light_large_test();
+
+// Medium buffer tests
+void malloc_light_medium_test();
+void stack_light_medium_test();
+void calloc_light_medium_test();
+void stack_initialized_light_medium_test();
 
 // Small buffer tests
 void malloc_light_small_test();
