@@ -23,7 +23,7 @@ light_usage_tests () {
     echo "***" Light Usage Test with $1
     echo "**************************************"
     flush_cache
-    LD_PRELOAD=./$1 ./light_usage_test --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=light_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
+    LD_PRELOAD=./$1 ./light_usage_test --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/light_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
 }
 
 sporatic_usage_tests () {
@@ -31,8 +31,10 @@ sporatic_usage_tests () {
     echo "***" Sporatic Usage Test with $1
     echo "**************************************"
     flush_cache
-    LD_PRELOAD=./$1 ./sporatic_usage_test --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=sporatic_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
+    LD_PRELOAD=./$1 ./sporatic_usage_test --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/sporatic_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
 }
+
+mkdir output
 
 ALLOCATION_LIBRARIES="libhoard.so  libjemalloc.so.2  libptmalloc3.so  libtcmalloc_minimal.so  libtcmalloc.so libc.so.6"
 for allocator in $ALLOCATION_LIBRARIES; do
