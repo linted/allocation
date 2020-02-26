@@ -97,6 +97,21 @@ urlcolor=\linkcolours}
 
 \usepackage{comment}
 
+\usepackage{listings}
+% code box settings
+\lstset{tabsize=4}
+% \lstdefinelanguage
+%    [x64]{Assembler}     % add a "x64" dialect of Assembler
+%    [x86masm]{Assembler} % based on the "x86masm" dialect
+%    % with these extra keywords:
+%    {morekeywords={CDQE,CQO,CMPSQ,CMPXCHG16B,JRCXZ,LODSQ,MOVSXD, %
+%                   POPFQ,PUSHFQ,SCASQ,STOSQ,IRETQ,RDTSCP,SWAPGS, %
+%                   rax,rdx,rcx,rbx,rsi,rdi,rsp,rbp, %
+%                   r8,r8d,r8w,r8b,r9,r9d,r9w,r9b, %
+%                   r10,r10d,r10w,r10b,r11,r11d,r11w,r11b, %
+%                   r12,r12d,r12w,r12b,r13,r13d,r13w,r13b, %
+%                   r14,r14d,r14w,r14b,r15,r15d,r15w,r15b}} % etc.
+
 \newcommand*\todo[0]{\textcolor{red}{TODO }}
 
 %\usepackage[1,2,3,5,6,7]{pagesel} %Discard page 4 as it is blank
@@ -213,6 +228,7 @@ After the structure is populated, the deallocation method is used to free the me
 Once again, the algorithm loops until a stop condition is met.
 
 \begin{algorithm}[h]
+  \label{struct_usage_algorithm}
   \caption{Allocation and Initialization of Data Structure}
   \begin{algorithmic}
     \WHILE{test is not finished}
@@ -224,7 +240,6 @@ Once again, the algorithm loops until a stop condition is met.
       \STATE $deallocate(M)$
     \ENDWHILE
   \end{algorithmic}
-  \label{struct_usage_algorithm}
 \end{algorithm}
 
 One of the most common usages of allocated memory is in network operations, which Algorithm \ref{network_usage_algorithm}, attempts to capture.
@@ -262,15 +277,23 @@ Each item in this set was chosen to provide an equal and full comparison between
 The set of tests can thus be divided into two groups, initialized and uninitialized allocations.
 Care is taken when discussing test results to ensure comparisons are conducted only between groups or individual members of a group to more accurately portray results of real world usage. 
 
+For each experiment the set of tests are also evaluated across multiple dynamic allocation implementations.
+The set of allocators include glibc, ptmalloc, jemalloc, tcmalloc, and hoard.
+This cross section of commonly used general purpose allocators are run independently through dynamic loading. 
+
+All experiments are run on a dedicated VPS with $4 \times 2693.67$ MHz CPUs, and $8$GB of ram.
+\todo do I need to say more about the test machine?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experiments: Algorithm \ref{light_usage_algorithm}}
+\section{Experiment: Algorithm \ref{light_usage_algorithm}}
+In order to obtain a baseline benchmark of allocation times, Algorithm \ref{light_usage_algorithm} is used with various sizes of $S$.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experiments: Algorithm \ref{struct_usage_algorithm}}
+\section{Experiment: Algorithm \ref{struct_usage_algorithm}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experiments: Algorithm \ref{network_usage_algorithm}}
+\section{Experiment: Algorithm \ref{network_usage_algorithm}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
@@ -297,10 +320,16 @@ Source code for all experiments detailed in this paper can be found at \url{\Git
 % ALRC increases the rate of convergence and decreases losses for otherwise unstable training by limiting loss spikes. If learning is already stable, it has little affect. Our algorithm is computationally inexpensive, robust to hyperparameter choices and can be applied to any loss function or batch size without affecting backpropagated gradient distributions. It follows that ALRC complements existing learning algorithms and can be applied to any artificial neural network trained with SGD.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Additional Figures}
 
-% \bibliographystyle{ieeetr}
-% \bibliography{bibliography}
+% \begin{figure}[tbp]
+% \centering
+% \includegraphics[width=0.97\columnwidth]{loss_spikes.png}
+% \caption{ Learning curve with high loss spikes that excessively perturb a trainable parameter distribution. Losses decrease after loss spikes as parameters are updated back to an intelligent distribution. The learning curve is 2500 iteration boxcar averaged. }
+% \label{loss_spikes}
+% \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Acknowledgements}
 
 \noindent This research was funded by .
