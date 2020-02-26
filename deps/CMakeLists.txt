@@ -6,6 +6,8 @@ if(PROCESSOR_COUNT EQUAL 0)
     set(PROCESSOR_COUNT 1) 
 endif()
 
+set(INSTALL_GTEST Off CACHE BOOL "turn gtest install off")
+
 add_subdirectory(googletest EXCLUDE_FROM_ALL)
 add_subdirectory(benchmark EXCLUDE_FROM_ALL)
 
@@ -61,3 +63,10 @@ ExternalProject_Add(
     BUILD_COMMAND make CXX=${CMAKE_CXX_COMPILER} -j ${PROCESSOR_COUNT}
     INSTALL_COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/hoard/src/libhoard.so ${CMAKE_BINARY_DIR}/bin
 )
+
+add_library(dlmalloc SHARED dlmalloc/source/dlmalloc.c)
+# add_custom_command()
+
+add_library(dlmalloc_threadsafe SHARED dlmalloc/source/dlmalloc.c)
+target_compile_definitions(dlmalloc_threadsafe PUBLIC USE_LOCKS)
+install(TARGETS dlmalloc_threadsafe dlmalloc DESTINATION ${CMAKE_BINARY_DIR}/bin)
