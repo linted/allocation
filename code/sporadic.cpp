@@ -44,19 +44,40 @@ newNetworkTest(do_stack_initialized_network_small, stack_initialized_network_sma
 newNetworkTest(do_calloc_network_small, calloc_network_small_test);
 
 // Register the function as a benchmark
+#ifndef DO_THREADED_TESTS
 BENCHMARK(do_stack_network_large);
 BENCHMARK(do_malloc_network_large);
 BENCHMARK(do_stack_initialized_network_large);
 BENCHMARK(do_calloc_network_large);
+#else 
+BENCHMARK(do_stack_network_large)->ThreadRange(1,8);
+BENCHMARK(do_malloc_network_large)->ThreadRange(1,8);
+BENCHMARK(do_stack_initialized_network_large)->ThreadRange(1,8);
+BENCHMARK(do_calloc_network_large)->ThreadRange(1,8);
+#endif
 // Register the function as a benchmark
+#ifndef DO_THREADED_TESTS
 BENCHMARK(do_stack_network_medium);
 BENCHMARK(do_malloc_network_medium);
 BENCHMARK(do_stack_initialized_network_medium);
 BENCHMARK(do_calloc_network_medium);
+#else 
+BENCHMARK(do_stack_network_medium)->ThreadRange(1,8);
+BENCHMARK(do_malloc_network_medium)->ThreadRange(1,8);
+BENCHMARK(do_stack_initialized_network_medium)->ThreadRange(1,8);
+BENCHMARK(do_calloc_network_medium)->ThreadRange(1,8);
+#endif
 // Register the function as a benchmark
+#ifndef DO_THREADED_TESTS
 BENCHMARK(do_stack_network_small);
 BENCHMARK(do_malloc_network_small);
 BENCHMARK(do_stack_initialized_network_small);
 BENCHMARK(do_calloc_network_small);
+#else 
+BENCHMARK(do_stack_network_small)->ThreadRange(1,8);
+BENCHMARK(do_malloc_network_small)->ThreadRange(1,8);
+BENCHMARK(do_stack_initialized_network_small)->ThreadRange(1,8);
+BENCHMARK(do_calloc_network_small)->ThreadRange(1,8);
+#endif
 // Run the benchmark
 BENCHMARK_MAIN();
