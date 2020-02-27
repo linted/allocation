@@ -11,10 +11,10 @@
     }
 
 // X_LARGE tests *********************************************************************
-newTest(do_malloc_xlarge,malloc_light_xlarge_test);
-newTest(do_stack_xlarge,stack_light_xlarge_test);
-newTest(do_calloc_xlarge,calloc_light_xlarge_test);
-newTest(do_stack_initialized_xlarge,stack_initialized_light_xlarge_test);
+newTest(do_malloc_huge,malloc_light_huge_test);
+newTest(do_stack_huge,stack_light_huge_test);
+newTest(do_calloc_huge,calloc_light_huge_test);
+newTest(do_stack_initialized_huge,stack_initialized_light_huge_test);
 
 // LARGE tests *********************************************************************
 newTest(do_malloc_large,malloc_light_large_test);
@@ -51,15 +51,15 @@ newTest(do_stack_initialized_multiple,stack_initialized_multi_test);
 
 // Register the function as a benchmark
 #ifndef DO_THREADED_TESTS
-BENCHMARK(do_stack_xlarge);
-BENCHMARK(do_malloc_xlarge);
-BENCHMARK(do_stack_initialized_xlarge);
-BENCHMARK(do_calloc_xlarge);
+BENCHMARK(do_stack_huge);
+BENCHMARK(do_malloc_huge);
+BENCHMARK(do_stack_initialized_huge);
+BENCHMARK(do_calloc_huge);
 #else
-BENCHMARK(do_stack_xlarge)->ThreadRange(1,8);
-BENCHMARK(do_malloc_xlarge)->ThreadRange(1,8);
-BENCHMARK(do_stack_initialized_xlarge)->ThreadRange(1,8);
-BENCHMARK(do_calloc_xlarge)->ThreadRange(1,8);
+BENCHMARK(do_stack_huge)->ThreadRange(1,8);
+BENCHMARK(do_malloc_huge)->ThreadRange(1,8);
+BENCHMARK(do_stack_initialized_huge)->ThreadRange(1,8);
+BENCHMARK(do_calloc_huge)->ThreadRange(1,8);
 #endif
 
 // Register the function as a benchmark

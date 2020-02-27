@@ -7,10 +7,10 @@ extern "C"
 #endif
 
 // Exta Large buffer tests
-void malloc_light_xlarge_test();
-void stack_light_xlarge_test();
-void calloc_light_xlarge_test();
-void stack_initialized_light_xlarge_test();
+void malloc_light_huge_test();
+void stack_light_huge_test();
+void calloc_light_huge_test();
+void stack_initialized_light_huge_test();
 
 // Large buffer tests
 void malloc_light_large_test();

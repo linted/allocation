@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define X_LARGE_BUFFER_SIZE 65445
+#define HUGE_BUFFER_SIZE 65445
 #define LARGE_BUFFER_SIZE 1024
 #define MEDIUM_BUFFER_SIZE 200
 #define SMALL_BUFFER_SIZE 16
@@ -58,10 +58,10 @@ void __attribute__((optimize("O0"))) do_nothing(volatile void *buff)
     }
 
 // Light extra large tests *********************************************************************
-LIGHT_MALLOC_TEST(malloc_light_xlarge_test, X_LARGE_BUFFER_SIZE)
-LIGHT_STACK_TEST(stack_light_xlarge_test, X_LARGE_BUFFER_SIZE)
-LIGHT_CALLOC_TEST(calloc_light_xlarge_test, X_LARGE_BUFFER_SIZE)
-LIGHT_STACK_INITIALIZED_TEST(stack_initialized_light_xlarge_test, X_LARGE_BUFFER_SIZE)
+LIGHT_MALLOC_TEST(malloc_light_huge_test, HUGE_BUFFER_SIZE)
+LIGHT_STACK_TEST(stack_light_huge_test, HUGE_BUFFER_SIZE)
+LIGHT_CALLOC_TEST(calloc_light_huge_test, HUGE_BUFFER_SIZE)
+LIGHT_STACK_INITIALIZED_TEST(stack_initialized_light_huge_test, HUGE_BUFFER_SIZE)
 // Light large tests *********************************************************************
 LIGHT_MALLOC_TEST(malloc_light_large_test, LARGE_BUFFER_SIZE)
 LIGHT_STACK_TEST(stack_light_large_test, LARGE_BUFFER_SIZE)
