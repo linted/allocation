@@ -14,4 +14,4 @@ target_include_directories(sporatic_usage_test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 
 
 install(TARGETS sporatic_usage_test light_usage_test DESTINATION ${CMAKE_BINARY_DIR}/bin/)
-install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/run_tests.sh DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/graph.py ${CMAKE_CURRENT_SOURCE_DIR}/run_tests.sh DESTINATION ${CMAKE_BINARY_DIR}/bin/)
