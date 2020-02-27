@@ -7,10 +7,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#define HUGE_BUFFER_SIZE 65445
-#define LARGE_BUFFER_SIZE 1024
-#define MEDIUM_BUFFER_SIZE 200
-#define SMALL_BUFFER_SIZE 16
+#include <light.h>
+#include <buffer_sizes.h>
+
 // #define STRUCT_TYPE struct sockaddr_in
 
 void __attribute__((optimize("O0"))) do_nothing(volatile void *buff)
