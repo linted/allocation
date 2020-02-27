@@ -19,6 +19,7 @@ def main():
 
     prog_name = results['context']['executable']
     debug = results['context']['library_build_type'] != 'release'
+    scaling_enabled = results['context']['cpu_scaling_enabled']
 
     benchmarks = {}
 
@@ -64,6 +65,10 @@ def main():
             pyplot.text(0.95, 0.05, 'DEBUG',
                 fontsize=50, color='gray',
                 ha='center', va='bottom', alpha=0.5, rotation=20)
+        if scaling_enabled:
+            pyplot.text(0.05, 0.95, 'SCALED',
+                fontsize=50, color='gray',
+                ha='center', va='top', alpha=0.5, rotation=20)
 
     pyplot.suptitle(args.results_file.lstrip('./')[:-5].replace("_", " "), va="center")
 
