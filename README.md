@@ -16,11 +16,13 @@ The following programs are required to build this project
 git submodule update --init --recursive
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release && make -j8
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+make install
 ```
-turn off building of docs by running
+turn off building of docs by changing the cmake command to:
 ```
-cmake .. -DCMAKE_BUILD_TYPE=Release -DNO_DOCS=true && make -j8
+cmake .. -DCMAKE_BUILD_TYPE=Release -DNO_DOCS=true
 ```
 
 ## Run
