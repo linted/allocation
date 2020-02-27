@@ -8,6 +8,11 @@ extern "C"
 
 int network_setup();
 
+ssize_t calloc_network_huge_test(int sock);
+ssize_t stack_initialized_network_huge_test(int sock);
+ssize_t malloc_network_huge_test(int sock);
+ssize_t stack_network_huge_test(int sock);
+
 ssize_t calloc_network_large_test(int sock);
 ssize_t stack_initialized_network_large_test(int sock);
 ssize_t malloc_network_large_test(int sock);
