@@ -72,7 +72,7 @@ for allocator in $ALLOCATION_LIBRARIES; do
     fi
 
     # run the threaded tests
-    sporatic_usage_threaded_tests $allocator_threaded 1 20
+    light_usage_threaded_tests $allocator_threaded 1 20
     sporatic_usage_threaded_tests $allocator_threaded 1 20
 
 done
