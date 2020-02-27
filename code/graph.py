@@ -65,6 +65,8 @@ def main():
                 fontsize=50, color='gray',
                 ha='center', va='bottom', alpha=0.5, rotation=20)
 
+    pyplot.suptitle(args.results_file.lstrip('./')[:-5].replace("_", " "))
+
     pyplot.tight_layout()
     if args.output:
         pyplot.savefig(args.output)
