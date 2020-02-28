@@ -33,6 +33,7 @@ ExternalProject_Add(
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ptmalloc
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ptmalloc
     URL http://www.malloc.de/malloc/ptmalloc3-current.tar.gz
+    URL_HASH SHA256=f353606f24a579597a1ff5b51009a45d75da047b3975d82c3f613f85bcf312db
     CONFIGURE_COMMAND cmake -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/ptmalloc ${CMAKE_CURRENT_BINARY_DIR}/ptmalloc
     BUILD_COMMAND make linux-shared -j ${PROCESSOR_COUNT}
     INSTALL_COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/ptmalloc/libptmalloc3.so ${CMAKE_BINARY_DIR}/bin
