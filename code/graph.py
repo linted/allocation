@@ -22,37 +22,43 @@ def main():
     debug = results['context']['library_build_type'] != 'release'
     scaling_enabled = results['context']['cpu_scaling_enabled']
 
-    benchmarks = {}
+    groups = {x:{} for x in args.groups}
 
+    # filter results
     for test in results['benchmarks']:
         if test['run_type'] == "aggregate":
-            if not benchmarks.get(test['run_name'], False):
-                benchmarks[test['run_name']] = {
-                    'mean':None, 
-                    'median':None, 
-                    'stddev':None,
-                }
-            benchmarks[test['run_name']][test['aggregate_name']] = test.get("bytes_per_second", test.get("cpu_time", None))
-    
+            for pattern in args.groups:
+                if re.search(pattern, test['run_name']):
+                    if not groups[pattern].get(test['run_name'], False):
+                        groups[pattern][test['run_name']] = {
+                            'mean':None, 
+                            'median':None, 
+                            'stddev':None,
+                        }
+                    groups[pattern][test['run_name']][test['aggregate_name']] = test.get("bytes_per_second", test.get("cpu_time", None))
+                    break
 
-    for group in range(len(args.groups)):
-        graph_elements = {}
-        for key in benchmarks.keys():
-            if re.search(args.groups[group], key):
-                graph_elements[key] = benchmarks[key]
 
-        y_ticks = np.arange(len(graph_elements))
+    # graph results
+    for groupNum in range(len(args.groups)):
+        graph_elements = groups[args.groups[groupNum]]
+        # print("{}:{}".format(args.groups[groupNum],graph_elements[args.groups[groupNum]]))
 
         if len(graph_elements) == 0:
             continue
 
+        y_ticks = np.arange(len(graph_elements))
+
         # and now plot everythin
-        pyplot.subplot(ceil(len(args.groups)/2), 2, group+1)
+        pyplot.subplot(ceil(len(args.groups)/2), 2, groupNum+1)
+
         pyplot.barh(y_ticks,
             [x['mean'] for x in graph_elements.values()], 
             xerr=[x['stddev'] for x in graph_elements.values()])
 
-        pyplot.yticks(y_ticks, labels=['-'.join(x.split('_')[1:-1]) + ((':' + x.split(':')[-1]) if ':' in x else '') for x in graph_elements.keys()])
+        ylabels = ['-'.join(x.split('_')[1:-1]) + ((':' + x.split(':')[-1]) if ':' in x else '') for x in graph_elements.keys()]
+
+        pyplot.yticks(y_ticks, labels=ylabels)
 
         xAxis = "Bytes per second" if results['benchmarks'][0].get("bytes_per_second", False) else "time in {}".format(results['benchmarks'][0]['time_unit'])
         pyplot.xlabel(xAxis)
@@ -60,7 +66,7 @@ def main():
         if len(args.groups) == 1:
             pyplot.title(prog_name)
         else:
-            pyplot.title(args.groups[group])
+            pyplot.title(args.groups[groupNum])
 
         if debug:
             pyplot.text(0.95, 0.05, 'DEBUG',
@@ -76,7 +82,7 @@ def main():
 
     pyplot.tight_layout()
     if args.output:
-        pyplot.savefig(args.output)
+        pyplot.savefig(args.output, dpi=300)
     else:
         pyplot.show()
 
