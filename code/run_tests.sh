@@ -16,7 +16,12 @@ light_usage_tests () {
     echo "***" Light Usage Tests with $1
     echo "******************************************"
     flush_cache
-    LD_PRELOAD=./$1 ./light_usage_test --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/light_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
+    if [ -f $1 ]; then
+        LIBRARY=./$1
+    else
+        LIBRARY=$1
+    fi
+    LD_PRELOAD=$LIBRARY ./light_usage_test --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/light_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
 }
 
 light_usage_threaded_tests () {
@@ -24,7 +29,12 @@ light_usage_threaded_tests () {
     echo "***" Light Usage Threaded Tests with $1
     echo "******************************************"
     flush_cache
-    LD_PRELOAD=./$1 ./light_usage_test_threaded --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/light_threaded_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
+    if [ -f $1 ]; then
+        LIBRARY=./$1
+    else
+        LIBRARY=$1
+    fi
+    LD_PRELOAD=$LIBRARY ./light_usage_test_threaded --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/light_threaded_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
 }
 
 sporatic_usage_tests () {
@@ -32,7 +42,12 @@ sporatic_usage_tests () {
     echo "***" Sporatic Usage Tests with $1
     echo "******************************************"
     flush_cache
-    LD_PRELOAD=./$1 ./sporatic_usage_test --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/sporatic_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
+    if [ -f $1 ]; then
+        LIBRARY=./$1
+    else
+        LIBRARY=$1
+    fi
+    LD_PRELOAD=$LIBRARY ./sporatic_usage_test --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/sporatic_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
 }
 
 sporatic_usage_threaded_tests () {
@@ -40,7 +55,12 @@ sporatic_usage_threaded_tests () {
     echo "***" Sporatic Usage Threaded Tests with $1
     echo "******************************************"
     flush_cache
-    LD_PRELOAD=./$1 ./sporatic_usage_test_threaded --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/sporatic_threaded_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
+    if [ -f $1 ]; then
+        LIBRARY=./$1
+    else
+        LIBRARY=$1
+    fi
+    LD_PRELOAD=$LIBRARY ./sporatic_usage_test_threaded --benchmark_min_time=$2 --benchmark_repetitions=$3 --benchmark_out=output/sporatic_threaded_$1_$2s_$3.json --benchmark_out_format=json --benchmark_display_aggregates_only=true
 }
 
 
@@ -54,7 +74,7 @@ trap 'cleanup $ncat_pid' SIGINT
 # make the output dir if it doesn't exist
 mkdir -p output
 
-ALLOCATION_LIBRARIES="libdlmalloc.so libhoard.so libptmalloc3.so libjemalloc.so.2 libtcmalloc_minimal.so"
+ALLOCATION_LIBRARIES="libdlmalloc.so libhoard.so libptmalloc3.so libjemalloc.so.2 libtcmalloc_minimal.so libc.so.6"
 for allocator in $ALLOCATION_LIBRARIES; do
     echo Starting work on $allocator
 
@@ -77,4 +97,4 @@ for allocator in $ALLOCATION_LIBRARIES; do
 
 done
 
-kill -9 $ncat_pid
+cleanup $ncat_pid
