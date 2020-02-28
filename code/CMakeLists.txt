@@ -25,4 +25,4 @@ target_compile_definitions(sporatic_usage_test_threaded PRIVATE DO_THREADED_TEST
 target_include_directories(sporatic_usage_test_threaded PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS sporatic_usage_test sporatic_usage_test_threaded light_usage_test light_usage_test_threaded DESTINATION ${CMAKE_BINARY_DIR}/bin/)
-install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/graph.py ${CMAKE_CURRENT_SOURCE_DIR}/run_tests.sh DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/graph.py ${CMAKE_CURRENT_SOURCE_DIR}/run_tests.sh ${CMAKE_CURRENT_SOURCE_DIR}/create_graphs.sh DESTINATION ${CMAKE_BINARY_DIR}/bin/)
