@@ -51,7 +51,7 @@ def main():
             [x['mean'] for x in graph_elements.values()], 
             xerr=[x['stddev'] for x in graph_elements.values()])
 
-        pyplot.yticks(y_ticks, labels=['-'.join(x.split('_')[1:-1]) for x in graph_elements.keys()])
+        pyplot.yticks(y_ticks, labels=['-'.join(x.split('_')[1:-1]) + ((':' + x.split(':')[-1]) if ':' in x else '') for x in graph_elements.keys()])
 
         xAxis = "Bytes per second" if results['benchmarks'][0].get("bytes_per_second", False) else "time in {}".format(results['benchmarks'][0]['time_unit'])
         pyplot.xlabel(xAxis)
