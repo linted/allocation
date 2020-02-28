@@ -5,6 +5,7 @@ import json
 import argparse
 import re
 from math import ceil
+from os import path
 
 def main():
     parser = argparse.ArgumentParser()
@@ -70,7 +71,8 @@ def main():
                 fontsize=50, color='gray',
                 ha='center', va='top', alpha=0.5, rotation=20)
 
-    pyplot.suptitle(args.results_file.lstrip('./')[:-5].replace("_", " "), va="center")
+    title = path.basename(args.results_file).replace("_", " ")
+    pyplot.suptitle(title if title[-5:] != '.json' else title[:-5], va="center")
 
     pyplot.tight_layout()
     if args.output:
