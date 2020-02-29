@@ -92,10 +92,11 @@ def main():
     ax.set_ylabel('test name', fontsize=15)
     ax.set_title(plot_title)
 
-    # ax.grid(True)
     fig.tight_layout()
-
-    plt.show()
+    if args.output:
+        fig.savefig(args.output, dpi=300)
+    else:
+        fig.show()
     
 
 if __name__ == "__main__":
