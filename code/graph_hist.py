@@ -84,19 +84,19 @@ def main():
     print(len(data))
 
     ax.set_xticks(np.arange(len(xlabels)))
-    ax.set_xticklabels(xlabels)
+    ax.set_xticklabels(xlabels, rotation=20, fontsize=5)
     ax.set_yticks(np.arange(len(ylabels)))
-    ax.set_yticklabels( ylabels)
+    ax.set_yticklabels(ylabels, fontsize=5)
 
-    ax.set_xlabel('test type', fontsize=15)
-    ax.set_ylabel('test name', fontsize=15)
+    ax.set_xlabel('Library', fontsize=10)
+    ax.set_ylabel('Test', fontsize=10)
     ax.set_title(plot_title)
 
     fig.tight_layout()
     if args.output:
-        fig.savefig(args.output, dpi=300)
+        plt.savefig(args.output, dpi=300)
     else:
-        fig.show()
+        plt.show()
     
 
 if __name__ == "__main__":
