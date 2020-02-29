@@ -81,7 +81,6 @@ def main():
         )
     )
 
-    print(len(data))
 
     ax.set_xticks(np.arange(len(xlabels)))
     ax.set_xticklabels(xlabels, rotation=20, fontsize=5)
