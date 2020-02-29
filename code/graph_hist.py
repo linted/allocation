@@ -11,6 +11,7 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("results_files", help="google benchmark results json output", nargs='+')
+    parser.add_argument('-f',"--filter", help="filter to remove results from graph", default='.*')
     # parser.add_argument('-g',"--groups", help="list of args", nargs='+', default=['.*'])
     parser.add_argument('-o',"--output", help="output file for the graph")
     args = parser.parse_args()
@@ -40,21 +41,21 @@ def main():
 
         for test in raw_data['benchmarks']:
             if test['run_type'] == "aggregate":
-
-                if not data.get(test['run_name'], False):
-                    data[test['run_name']] = {}
-                if not data[test['run_name']].get(files, False):
-                    data[test['run_name']][files] = {
-                        'mean':None, 
-                        'median':None, 
-                        'stddev':None,
-                    }
-                data[test['run_name']][files][test['aggregate_name']] = test.get("bytes_per_second", test.get("cpu_time", None))
+                if re.search(args.filter, test['run_name']):
+                    if not data.get(test['run_name'], False):
+                        data[test['run_name']] = {}
+                    if not data[test['run_name']].get(files, False):
+                        data[test['run_name']][files] = {
+                            'mean':None, 
+                            'median':None, 
+                            'stddev':None,
+                        }
+                    data[test['run_name']][files][test['aggregate_name']] = test.get("bytes_per_second", test.get("cpu_time", None))
 
     # print(data)
 
     for test in zip(data, range(len(data))):
-        test_name = ' '.join(test[0].split('_')[1:]) + ((':' + test[0].split(':')[-1]) if ':' in test[0] else '')
+        test_name = ' '.join(test[0].rsplit('/')[0].split('_')[1:]) + ((':' + test[0].split(':')[-1]) if ':' in test[0] else '')
 
         ylabels.append(test_name)
         for fileNum in range(len(args.results_files)):
