@@ -23,12 +23,13 @@ def main():
     weights = []
     ylabels = []
     xlabels = []
+    plot_title = 'Completion time'
 
     for files in args.results_files:
         with open(files, 'r') as fin:
             raw_data = json.load(fin)
          
-        matches = re.search(r".*(lib.*\.so).*",path.basename(files))
+        matches = re.search(r".*(lib.*\.so(?:\.\d+)?).*",path.basename(files))
         if matches:
             data_set_name = matches[1]
         else:
@@ -50,7 +51,11 @@ def main():
                             'median':None, 
                             'stddev':None,
                         }
-                    data[test['run_name']][files][test['aggregate_name']] = test.get("bytes_per_second", test.get("cpu_time", None))
+                    if test.get("bytes_per_second",False) is not False:
+                        data[test['run_name']][files][test['aggregate_name']] = test["bytes_per_second"]
+                        plot_title = "Bytes per second"
+                    else:
+                        data[test['run_name']][files][test['aggregate_name']] = -test.get("cpu_time", None)
 
     # print(data)
 
@@ -61,7 +66,7 @@ def main():
         for fileNum in range(len(args.results_files)):
             xCoordinates.append(fileNum)
             yCoordinates.append(test[1])
-            weights.append(-data[test[0]][args.results_files[fileNum]]['mean'])
+            weights.append(data[test[0]][args.results_files[fileNum]]['mean'])
 
 
     fig, ax = plt.subplots()
@@ -85,7 +90,7 @@ def main():
 
     ax.set_xlabel('test type', fontsize=15)
     ax.set_ylabel('test name', fontsize=15)
-    ax.set_title('Completion time')
+    ax.set_title(plot_title)
 
     # ax.grid(True)
     fig.tight_layout()
