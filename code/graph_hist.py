@@ -27,7 +27,7 @@ def main():
         with open(files, 'r') as fin:
             raw_data = json.load(fin)
          
-        matches = re.search(".*(lib.*\.so).*",path.basename(files))
+        matches = re.search(r".*(lib.*\.so).*",path.basename(files))
         if matches:
             data_set_name = matches[1]
         else:
