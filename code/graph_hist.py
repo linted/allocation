@@ -29,6 +29,9 @@ def main():
         with open(files, 'r') as fin:
             raw_data = json.load(fin)
          
+        debug = raw_data['context']['library_build_type'] != 'release'
+        scaling_enabled = raw_data['context']['cpu_scaling_enabled']
+
         matches = re.search(r".*(lib.*\.so(?:\.\d+)?).*",path.basename(files))
         if matches:
             data_set_name = matches[1]
@@ -71,25 +74,35 @@ def main():
 
     fig, ax = plt.subplots()
     ax.hist2d(
-        xCoordinates,
         yCoordinates,
+        xCoordinates,
         weights=weights,
         cmap='plasma',
         bins=(
+            np.arange(len(data)+1)-0.5,
             np.arange(len(args.results_files)+1)-0.5, 
-            np.arange(len(data)+1)-0.5
         )
     )
 
 
-    ax.set_xticks(np.arange(len(xlabels)))
-    ax.set_xticklabels(xlabels, rotation=20, fontsize=5)
-    ax.set_yticks(np.arange(len(ylabels)))
-    ax.set_yticklabels(ylabels, fontsize=5)
+    ax.set_yticks(np.arange(len(xlabels)))
+    ax.set_yticklabels(xlabels, rotation=20, fontsize=9)
+    ax.set_xticks(np.arange(len(ylabels)))
+    ax.set_xticklabels(ylabels, rotation=20, fontsize=9)
 
-    ax.set_xlabel('Library', fontsize=10)
-    ax.set_ylabel('Test', fontsize=10)
+    ax.set_ylabel('Library', fontsize=10)
+    ax.set_xlabel('Test', fontsize=10)
     ax.set_title(plot_title)
+
+
+    if debug:
+        ax.text(0.95, 0.05, 'DEBUG',
+            fontsize=50, color='gray',
+            ha='center', va='bottom', alpha=0.5, rotation=20)
+    if scaling_enabled:
+        ax.text(0.05, 0.95, 'SCALED',
+            fontsize=50, color='gray',
+            ha='center', va='top', alpha=0.5, rotation=20)
 
     fig.tight_layout()
     if args.output:
