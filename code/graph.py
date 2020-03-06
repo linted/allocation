@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-import numpy as np
-from matplotlib import pyplot
+import pandas as pd
+# import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import json
 import argparse
 import re
@@ -21,70 +23,20 @@ def main():
     prog_name = results['context']['executable']
     debug = results['context']['library_build_type'] != 'release'
     scaling_enabled = results['context']['cpu_scaling_enabled']
+    yaxis = 'bytes_per_second' if results['benchmarks'][0].get("bytes_per_second", False) else 'cpu_time'
 
-    groups = {x:{} for x in args.groups}
+    raw_data = pd.DataFrame(results['benchmarks']).dropna(subset=['aggregate_name'])
 
-    # filter results
-    for test in results['benchmarks']:
-        if test['run_type'] == "aggregate":
-            for pattern in args.groups:
-                if re.search(pattern, test['run_name']):
-                    if not groups[pattern].get(test['run_name'], False):
-                        groups[pattern][test['run_name']] = {
-                            'mean':None, 
-                            'median':None, 
-                            'stddev':None,
-                        }
-                    groups[pattern][test['run_name']][test['aggregate_name']] = test.get("bytes_per_second", test.get("cpu_time", None))
-                    break
+    figure = make_subplots(rows=ceil(len(args.groups)/2), cols=2 if len(args.groups) > 1 else 1)
 
-
-    # graph results
-    for groupNum in range(len(args.groups)):
-        graph_elements = groups[args.groups[groupNum]]
-        # print("{}:{}".format(args.groups[groupNum],graph_elements[args.groups[groupNum]]))
-
-        if len(graph_elements) == 0:
-            continue
-
-        y_ticks = np.arange(len(graph_elements))
-
-        # and now plot everythin
-        pyplot.subplot(ceil(len(args.groups)/2), 2, groupNum+1)
-
-        pyplot.barh(y_ticks,
-            [x['mean'] for x in graph_elements.values()], 
-            xerr=[x['stddev'] for x in graph_elements.values()])
-
-        ylabels = ['-'.join(x.split('_')[1:-1]) + ((':' + x.split(':')[-1]) if ':' in x else '') for x in graph_elements.keys()]
-
-        pyplot.yticks(y_ticks, labels=ylabels)
-
-        xAxis = "Bytes per second" if results['benchmarks'][0].get("bytes_per_second", False) else "time in {}".format(results['benchmarks'][0]['time_unit'])
-        pyplot.xlabel(xAxis)
-
-        if len(args.groups) == 1:
-            pyplot.title(prog_name)
-        else:
-            pyplot.title(args.groups[groupNum])
-
-        if debug:
-            pyplot.text(0.95, 0.05, 'DEBUG',
-                fontsize=50, color='gray',
-                ha='center', va='bottom', alpha=0.5, rotation=20)
-        if scaling_enabled:
-            pyplot.text(0.05, 0.95, 'SCALED',
-                fontsize=50, color='gray',
-                ha='center', va='top', alpha=0.5, rotation=20)
-
-    title = path.basename(args.results_file).replace("_", " ")
-    pyplot.suptitle(title if title[-5:] != '.json' else title[:-5], va="center")
-
-    pyplot.tight_layout()
-    if args.output:
-        pyplot.savefig(args.output, dpi=300)
-    else:
-        pyplot.show()
+    for group in range(len(args.groups)):
+        data = raw_data[raw_data['name'].str.contains(args.groups[group])]
+        # fig = px.bar(data, y="run_name", x=yaxis, orientation='h')
+        # fig.show()
+        figure.append_trace(go.Bar(y=data.run_name, x=data[yaxis], orientation='h', name=args.groups[group]), 1+(group//2), 1+(group%2))
+        
+    figure.show()
+    
 
 if __name__ == "__main__":
     main()
