@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ 3 -ne $# ]; then
-    echo "Usage: " $0 " <Binary Dir> <Source Dir>  <Output Dir>"
+    echo "Usage: " $0 " <Binary Dir> <Source Dir> <Output Dir>"
 fi
 
 BINARY_DIR=$1
