@@ -52,8 +52,7 @@ def main():
             z=dataFrame[dataFrame.columns.difference(['name'])],
             x=dataFrame.columns.difference(['name']),
             y=dataFrame['name'].str.extract(r"do_([\w_]*)(?:/threads:(\d))?_mean").dropna(axis=1).agg(':'.join, axis=1),
-            reversescale=(measurement == 'cpu_time'),
-            ticksuffix='ms'
+            reversescale=(measurement == 'cpu_time')
             # colorscale='Viridis'
         )
     )
