@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-import matplotlib.pyplot as plt
-from matplotlib import colors
+import pandas as pd
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from plotly.io import orca
 import argparse
 import json
 import re
@@ -12,25 +14,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("results_files", help="google benchmark results json output", nargs='+')
     parser.add_argument('-f',"--filter", help="filter to remove results from graph", default='.*')
+    parser.add_argument('-s',"--server", help="orca server url", default="http://localhost:9091")
     # parser.add_argument('-g',"--groups", help="list of args", nargs='+', default=['.*'])
     parser.add_argument('-o',"--output", help="output file for the graph")
     args = parser.parse_args()
 
-    data = {}
-
-    xCoordinates = []
-    yCoordinates = []
-    weights = []
-    ylabels = []
-    xlabels = []
-    plot_title = 'Completion time'
+    dataFrame = None
+    measurement = None
 
     for files in args.results_files:
         with open(files, 'r') as fin:
             raw_data = json.load(fin)
-         
-        debug = raw_data['context']['library_build_type'] != 'release'
-        scaling_enabled = raw_data['context']['cpu_scaling_enabled']
 
         matches = re.search(r".*(lib.*\.so(?:\.\d+)?).*",path.basename(files))
         if matches:
@@ -40,75 +34,35 @@ def main():
             if data_set_name.endswith(".json"):
                 data_set_name = data_set_name[:-5]
 
+        if measurement is None:
+            measurement = 'bytes_per_second' if raw_data['benchmarks'][0].get("bytes_per_second", False) else 'cpu_time'
         
-        xlabels.append(data_set_name)
+        data = pd.DataFrame(raw_data["benchmarks"]).dropna(subset=['aggregate_name'])
+        for items in args.filter:
+            data = data[items != data.name]
+        data = data['mean' == data.aggregate_name][['name',measurement]].rename(columns={measurement:data_set_name})
+        if dataFrame is None:
+            dataFrame = data
+        else:
+            dataFrame = dataFrame.merge(data, on="name")
 
-        for test in raw_data['benchmarks']:
-            if test['run_type'] == "aggregate":
-                if re.search(args.filter, test['run_name']):
-                    if not data.get(test['run_name'], False):
-                        data[test['run_name']] = {}
-                    if not data[test['run_name']].get(files, False):
-                        data[test['run_name']][files] = {
-                            'mean':None, 
-                            'median':None, 
-                            'stddev':None,
-                        }
-                    if test.get("bytes_per_second",False) is not False:
-                        data[test['run_name']][files][test['aggregate_name']] = test["bytes_per_second"]
-                        plot_title = "Bytes per second"
-                    else:
-                        data[test['run_name']][files][test['aggregate_name']] = -test.get("cpu_time", None)
-
-    # print(data)
-
-    for test in zip(data, range(len(data))):
-        test_name = ' '.join(test[0].rsplit('/')[0].split('_')[1:]) + ((':' + test[0].split(':')[-1]) if ':' in test[0] else '')
-
-        ylabels.append(test_name)
-        for fileNum in range(len(args.results_files)):
-            xCoordinates.append(fileNum)
-            yCoordinates.append(test[1])
-            weights.append(data[test[0]][args.results_files[fileNum]]['mean'])
-
-
-    fig, ax = plt.subplots()
-    ax.hist2d(
-        yCoordinates,
-        xCoordinates,
-        weights=weights,
-        cmap='plasma',
-        bins=(
-            np.arange(len(data)+1)-0.5,
-            np.arange(len(args.results_files)+1)-0.5, 
+    # print(dataFrame['name'].str.extract(r"do_([\w_]*)(?:/threads:(\d))?_mean").dropna(axis=1)[0])
+    figure = go.Figure(
+        data=go.Heatmap(
+            z=dataFrame[dataFrame.columns.difference(['name'])],
+            x=dataFrame.columns.difference(['name']),
+            y=dataFrame['name'].str.extract(r"do_([\w_]*)(?:/threads:(\d))?_mean").dropna(axis=1).agg(':'.join, axis=1),
+            reversescale=(measurement == 'cpu_time'),
+            ticksuffix='ms'
+            # colorscale='Viridis'
         )
     )
 
-
-    ax.set_yticks(np.arange(len(xlabels)))
-    ax.set_yticklabels(xlabels, rotation=20, fontsize=9)
-    ax.set_xticks(np.arange(len(ylabels)))
-    ax.set_xticklabels(ylabels, rotation=20, fontsize=9)
-
-    ax.set_ylabel('Library', fontsize=10)
-    ax.set_xlabel('Test', fontsize=10)
-    ax.set_title(plot_title)
-
-
-    if debug:
-        ax.text(0.95, 0.05, 'DEBUG',
-            fontsize=50, color='gray',
-            ha='center', va='bottom', alpha=0.5, rotation=20)
-    if scaling_enabled:
-        ax.text(0.05, 0.95, 'SCALED',
-            fontsize=50, color='gray',
-            ha='center', va='top', alpha=0.5, rotation=20)
-
-    fig.tight_layout()
-    if args.output:
-        plt.savefig(args.output, dpi=300)
+    if args.output == None:
+        figure.show()
     else:
-        plt.show()
+        orca.config.server_url = args.server
+        figure.write_image(args.output)
     
 
 if __name__ == "__main__":

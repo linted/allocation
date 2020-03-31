@@ -2,6 +2,7 @@
 
 if [ 3 -ne $# ]; then
     echo "Usage: " $0 " <Binary Dir> <Source Dir> <Output Dir>"
+    exit 1
 fi
 
 BINARY_DIR=$1
