@@ -21,7 +21,7 @@ def main():
     with open(args.results_file, 'r') as fin:
         results = json.load(fin)
 
-    plot_title = ' '.join(x[0].capitalize() + x[1:] for x in results['context']['executable'].lstrip('./').split("_")) + " using " + basename(args.results_file).split("_")[1]
+    plot_title = ' '.join(x.capitalize() for x in results['context']['executable'].lstrip('./').split("_")) + " using " + basename(args.results_file).split("_")[1]
     # debug = results['context']['library_build_type'] != 'release'
     # scaling_enabled = results['context']['cpu_scaling_enabled']
     yaxis = 'bytes_per_second' if results['benchmarks'][0].get("bytes_per_second", False) else 'cpu_time'
