@@ -13,6 +13,7 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("results_files", help="google benchmark results json output", nargs='+')
+    parser.add_argument("-t", "--title", help="Title for the graph")
     parser.add_argument('-f',"--filter", help="filter to remove results from graph", default='.*')
     parser.add_argument('-s',"--server", help="orca server url", default="http://localhost:9091")
     # parser.add_argument('-g',"--groups", help="list of args", nargs='+', default=['.*'])
@@ -55,6 +56,15 @@ def main():
             reversescale=(measurement == 'cpu_time')
             # colorscale='Viridis'
         )
+    )
+
+    figure.update_layout(
+        title={
+            'text': args.title,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+        }
     )
 
     if args.output == None:
