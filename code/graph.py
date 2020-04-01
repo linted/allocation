@@ -28,24 +28,29 @@ def main():
 
     raw_data = pd.DataFrame(results['benchmarks']).dropna(subset=['aggregate_name'])
     raw_data = raw_data['mean' == raw_data.aggregate_name]
-    figure = make_subplots(rows=ceil(len(args.groups)/2), cols=2 if len(args.groups) > 1 else 1)
+    figure = make_subplots(rows=ceil(len(args.groups)/2), cols=2 if len(args.groups) > 1 else 1, shared_yaxes=True)
 
     for group in range(len(args.groups)):
         data = raw_data[raw_data['name'].str.contains(args.groups[group])]
         # fig = px.bar(data, y="run_name", x=yaxis, orientation='h')
         # fig.show()
-        figure.append_trace(
-            go.Bar(
+        t = go.Bar(
                 y=data.run_name.str.extract(r"do_([\w_]*)(?:_{})(?:/threads:(\d))?".format(args.groups[group])).dropna(axis=1).agg(':'.join, axis=1), 
                 x=data[yaxis], 
                 orientation='h', 
                 name=args.groups[group],
                 text=data[yaxis].round(2),
                 textposition='auto',
-            ),
+                # showticklabels=False,
+            )
+        
+        figure.append_trace(
+            t,
             1+(group//2), 
             1+(group%2)
         )
+
+
     figure.update_layout(
         title={
             'text': plot_title,
