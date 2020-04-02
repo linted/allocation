@@ -228,7 +228,6 @@ After the structure is populated, the deallocation method is used to free the me
 Once again, the algorithm loops until a stop condition is met.
 
 \begin{algorithm}[h]
-  \label{struct_usage_algorithm}
   \caption{Allocation and Initialization of Data Structure}
   \begin{algorithmic}
     \WHILE{test is not finished}
@@ -240,6 +239,7 @@ Once again, the algorithm loops until a stop condition is met.
       \STATE $deallocate(M)$
     \ENDWHILE
   \end{algorithmic}
+\label{struct_usage_algorithm}
 \end{algorithm}
 
 One of the most common usages of allocated memory is in network operations, which Algorithm \ref{network_usage_algorithm}, attempts to capture.
@@ -277,16 +277,55 @@ Each item in this set was chosen to provide an equal and full comparison between
 The set of tests can thus be divided into two groups, initialized and uninitialized allocations.
 Care is taken when discussing test results to ensure comparisons are conducted only between groups or individual members of a group to more accurately portray results of real world usage. 
 
+The tests are measued using various allocation sizes.
+These sizes include \textit{32, 256, 4096, 32768} bytes referred to as small, medium, large, and Huge respectively.
 For each experiment the set of tests are also evaluated across multiple dynamic allocation implementations.
-The set of allocators include glibc, ptmalloc, jemalloc, tcmalloc, and hoard.
-This cross section of commonly used general purpose allocators are run independently through dynamic loading. 
+The set of allocators include \textit{glibc, ptmalloc, jemalloc, tcmalloc,} and \textit{hoard}.
+This cross section of commonly used general purpose allocators are run independently through dynamic loading.
 
-All experiments are run on a dedicated VPS with $4 \times 2693.67$ MHz CPUs, and $8$GB of ram.
+\todo Do I need to talk about the threaded tests?
+
+All experiments are run on a dedicated VPS with $4 \times 2693.67$ MHz CPUs and $8$GB of ram.
+The results shown are the average completion time or throughput of an algorithm after being run for 20 iterations with a minimum of 1 second per iteration.
 \todo do I need to say more about the test machine?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment: Algorithm \ref{light_usage_algorithm}}
-In order to obtain a baseline benchmark of allocation times, Algorithm \ref{light_usage_algorithm} is used with various sizes of $S$.
+In order to obtain a baseline benchmark of allocation times, Algorithm \ref{light_usage_algorithm} is used with the various sizes of $S$.
+Fig. \ref{algo1_complete_hist} shows a comparison of the relative speed differences across the six allocation libraries.
+
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/light_hist1.png}
+  \caption{ Comparison of allocation methods in nano seconds }
+  \label{algo1_complete_hist}
+\end{figure} 
+
+Fig. \ref{algo1_libc.so.6_bar} shows a speed comparison for libc.so.6, and is broken into separate graphs based on the allocation size.
+This figure clearly shows the progressive time increases that both calloc and initialized stack allocations go through as the allocation size increases.
+It should also be noted that malloc and uninitialized stack allocations have relatively fixed performance costs.
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{{graphs/light_libc.so.6_1s_20}.png} %stupid .'s in file names
+  \caption{ Performance differences in libc.so.6 between allocation methods at various sizes (Nano Seconds) }
+  \label{algo1_libc.so.6_bar}
+\end{figure} 
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/light_stack_malloc_hist1.png}
+  \caption{ Comparison of allocation methods in nano seconds }
+  \label{algo1_stack_malloc_hist}
+\end{figure}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/light_init_calloc_hist1.png}
+  \caption{ Comparison of allocation methods in nano seconds }
+  \label{algo1_init_calloc_hist}
+\end{figure} 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -324,8 +363,8 @@ Source code for all experiments detailed in this paper can be found at \url{\Git
 
 % \begin{figure}[tbp]
 % \centering
-% \includegraphics[width=0.97\columnwidth]{loss_spikes.png}
-% \caption{ Learning curve with high loss spikes that excessively perturb a trainable parameter distribution. Losses decrease after loss spikes as parameters are updated back to an intelligent distribution. The learning curve is 2500 iteration boxcar averaged. }
+% \includegraphics[width=\columnwidth]{figure_1.png}
+% \caption{blah }
 % \label{loss_spikes}
 % \end{figure}
 
