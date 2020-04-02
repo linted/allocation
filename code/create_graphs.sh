@@ -21,23 +21,50 @@ for threaded_data in $SOURCE_DIR/*thread*; do
 done
 wait
 
-echo "Creating full histograms"
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -t "Light Usage Compairison" -o $OUTPUT_DIR/light_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -t "Threaded Light Usage Compairison" -o $OUTPUT_DIR/light_threaded_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_lib*.json -t "Sporatic Usage Compairison" -o $OUTPUT_DIR/sporatic_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_thread*.json -t "Threaded Sporatic Usage Compairison" -o $OUTPUT_DIR/sporatic_threaded_hist.png &
+echo "Creating Algo 1 histograms"
+echo "-Creating full histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -f "small" "medium" "large" "huge" -t "Light Usage Compairison" -o $OUTPUT_DIR/light_hist1.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -f "small" "medium" "large" "huge" -t "Threaded Light Usage Compairison" -o $OUTPUT_DIR/light_threaded_hist1.png &
 wait
 
-echo "Creating stack and malloc histograms"
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -f "stack_[^i]|malloc" -t "Light Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/light_stack_malloc_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -f "stack_[^i]|malloc" -t "Threaded Light Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/light_stack_malloc_threaded_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_lib*.json -f "stack_[^i]|malloc" -t "Sporatic Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/sporatic_stack_malloc_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_thread*.json -f "stack_[^i]|malloc" -t "Threaded Sporatic Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/sporatic_stack_malloc_threaded_hist.png &
+echo "-Creating stack and malloc histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -f "stack_small" "stack_medium" "stack_large" "stack_huge" "malloc_small" "malloc_medium" "malloc_large" "malloc_huge" -t "Light Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/light_stack_malloc_hist1.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -f "stack_small" "stack_medium" "stack_large" "stack_huge" "malloc_small" "malloc_medium" "malloc_large" "malloc_huge" -t "Threaded Light Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/light_stack_malloc_threaded_hist1.png &
 wait
 
-echo "Creating init and calloc histograms"
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -f "init|calloc" -t "Light Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/light_init_calloc_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -f "init|calloc" -t "Threaded Light Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/light_init_calloc_threaded_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_lib*.json -f "init|calloc" -t "Sporatic Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/sporatic_init_calloc_hist.png &
-$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_thread*.json -f "init|calloc" -t "Threaded Sporatic Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/sporatic_init_calloc_threaded_hist.png &
+echo "-Creating init and calloc histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -f "initialized_small" "initialized_medium" "initialized_large" "initialized_huge" "calloc_small" "calloc_medium" "calloc_large" "calloc_huge" -t "Light Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/light_init_calloc_hist1.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -f "initialized_small" "initialized_medium" "initialized_large" "initialized_huge" "calloc_small" "calloc_medium" "calloc_large" "calloc_huge"  -t "Threaded Light Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/light_init_calloc_threaded_hist1.png &
+wait
+
+echo "Creating Algo 2 histograms"
+echo "-Creating full histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -f "struct" -t "Light Usage Compairison" -o $OUTPUT_DIR/light_hist2.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -f "struct" -t "Threaded Light Usage Compairison" -o $OUTPUT_DIR/light_threaded_hist2.png &
+wait
+
+echo "-Creating stack and malloc histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -f "stack_[^i(:?st)(:?mu)]" "malloc_[^(:?st)(:?mu)]" -t "Light Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/light_stack_malloc_hist2.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -f "stack_[^i(:?st)(:?mu)]" "_[^(:?st)(:?mu)][^(:?st)(:?mu)]" -t "Threaded Light Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/light_stack_malloc_threaded_hist2.png &
+wait
+
+echo "-Creating init and calloc histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_lib*.json -f "initialized_small" "initialized_medium" "initialized_large" "initialized_huge" "calloc_small" "calloc_medium" "calloc_large" "calloc_huge" -t "Light Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/light_init_calloc_hist2.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/light_thread*.json -f "initialized_small" "initialized_medium" "initialized_large" "initialized_huge" "calloc_small" "calloc_medium" "calloc_large" "calloc_huge"  -t "Threaded Light Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/light_init_calloc_threaded_hist2.png &
+wait
+
+echo "Creating Algo 3 histograms"
+echo "-Creating full histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_lib*.json -f "small" "medium" "large" "huge" -t "Sporatic Usage Compairison" -o $OUTPUT_DIR/sporatic_hist3.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_thread*.json -f "small" "medium" "large" "huge" -t "Threaded Sporatic Usage Compairison" -o $OUTPUT_DIR/sporatic_threaded_hist3.png &
+wait
+
+echo "-Creating stack and malloc histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_lib*.json -f "stack_[^i(:?st)(:?mu)]" "malloc_[^(:?st)(:?mu)]" -t "Sporatic Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/sporatic_stack_malloc_hist3.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_thread*.json -f "stack_[^i(:?st)(:?mu)]" "malloc_[^(:?st)(:?mu)]" -t "Threaded Sporatic Usage Stack and Malloc Compairison" -o $OUTPUT_DIR/sporatic_stack_malloc_threaded_hist3.png &
+wait
+
+echo "-Creating init and calloc histograms"
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_lib*.json -f "initialized.*_small" "initialized.*_medium" "initialized.*_large" "initialized.*_huge" "calloc.*_small" "calloc.*_medium" "calloc.*_large" "calloc.*_huge"  -t "Sporatic Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/sporatic_init_calloc_hist3.png &
+$BINARY_DIR/graph_hist.py $SOURCE_DIR/sporatic_thread*.json -f "initialized.*_small" "initialized.*_medium" "initialized.*_large" "initialized.*_huge" "calloc.*_small" "calloc.*_medium" "calloc.*_large" "calloc.*_huge"  -t "Threaded Sporatic Usage Initalized and Calloc Compairison" -o $OUTPUT_DIR/sporatic_init_calloc_threaded_hist3.png &
 wait

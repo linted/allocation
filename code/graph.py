@@ -24,7 +24,7 @@ def main():
     plot_title = ' '.join(x.capitalize() for x in results['context']['executable'].lstrip('./').split("_")) + " using " + basename(args.results_file).split("_")[1]
     # debug = results['context']['library_build_type'] != 'release'
     # scaling_enabled = results['context']['cpu_scaling_enabled']
-    yaxis = 'bytes_per_second' if results['benchmarks'][0].get("bytes_per_second", False) else 'cpu_time'
+    yaxis,units = ('bytes_per_second',"B/s") if results['benchmarks'][0].get("bytes_per_second", False) else ('cpu_time',results['benchmarks'][0].get("time_unit"))
 
     raw_data = pd.DataFrame(results['benchmarks']).dropna(subset=['aggregate_name'])
     raw_data = raw_data['mean' == raw_data.aggregate_name]
@@ -49,6 +49,7 @@ def main():
             1+(group//2), 
             1+(group%2)
         )
+        
 
 
     figure.update_layout(
@@ -60,12 +61,13 @@ def main():
             'yanchor': 'top'
         }
     )
+    figure.update_xaxes(ticksuffix=units, showticksuffix="all")
 
     if args.output == None:
         figure.show()
     else:
         orca.config.server_url = args.server
-        figure.write_image(args.output)
+        figure.write_image(args.output, scale=2)
             
 
 if __name__ == "__main__":
