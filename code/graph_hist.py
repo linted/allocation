@@ -14,13 +14,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("results_files", help="google benchmark results json output", nargs='+')
     parser.add_argument("-t", "--title", help="Title for the graph")
-    parser.add_argument('-f',"--filter", help="filter to remove results from graph", default='.*')
+    parser.add_argument('-f',"--filter", help="filter to select results from graph", default=['.*'], nargs="*")
     parser.add_argument('-s',"--server", help="orca server url", default="http://localhost:9091")
     # parser.add_argument('-g',"--groups", help="list of args", nargs='+', default=['.*'])
     parser.add_argument('-o',"--output", help="output file for the graph")
     args = parser.parse_args()
 
-    dataFrame = None
+    raw_dataFrame = None
     measurement = None
 
     for files in args.results_files:
@@ -39,21 +39,24 @@ def main():
             measurement = 'bytes_per_second' if raw_data['benchmarks'][0].get("bytes_per_second", False) else 'cpu_time'
         
         data = pd.DataFrame(raw_data["benchmarks"]).dropna(subset=['aggregate_name'])
-        for items in args.filter:
-            data = data[items != data.name]
         data = data['mean' == data.aggregate_name][['name',measurement]].rename(columns={measurement:data_set_name})
-        if dataFrame is None:
-            dataFrame = data
+        if raw_dataFrame is None:
+            raw_dataFrame = data
         else:
-            dataFrame = dataFrame.merge(data, on="name")
+            raw_dataFrame = raw_dataFrame.merge(data, on="name")
+    
+    # print(raw_dataFrame.name)
+    dataFrame = pd.DataFrame(columns=raw_dataFrame.columns)
+    for filters in args.filter:
+        dataFrame = dataFrame.merge(raw_dataFrame[raw_dataFrame.name.str.contains(filters)], how="outer")
 
     # print(dataFrame['name'].str.extract(r"do_([\w_]*)(?:/threads:(\d))?_mean").dropna(axis=1)[0])
     figure = go.Figure(
         data=go.Heatmap(
             z=dataFrame[dataFrame.columns.difference(['name'])],
             x=dataFrame.columns.difference(['name']),
-            y=dataFrame['name'].str.extract(r"do_([\w_]*)(?:/threads:(\d))?_mean").dropna(axis=1).agg(':'.join, axis=1),
-            reversescale=(measurement == 'cpu_time')
+            y=dataFrame['name'].str.extract(r"do_([\w_]*)(?:/threads:(\d))?_mean").dropna(axis=1).agg(':'.join, axis=1).str.replace("_", " ", regex=False),
+            reversescale=(measurement == 'cpu_time'),
             # colorscale='Viridis'
         )
     )
@@ -64,14 +67,15 @@ def main():
             'x':0.5,
             'xanchor': 'center',
             'yanchor': 'top'
-        }
+        },
+        # yaxis={"ticksuffix": ""}
     )
 
     if args.output == None:
         figure.show()
     else:
         orca.config.server_url = args.server
-        figure.write_image(args.output)
+        figure.write_image(args.output, scale=2, width=840, height=600)
     
 
 if __name__ == "__main__":
