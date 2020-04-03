@@ -20,13 +20,16 @@ def main():
     parser.add_argument('-o',"--output", help="output file for the graph")
     args = parser.parse_args()
 
+    units = None
     raw_dataFrame = None
     measurement = None
 
     for files in args.results_files:
         with open(files, 'r') as fin:
             raw_data = json.load(fin)
-
+        
+        if units is None:
+            units = "B/s" if raw_data['benchmarks'][0].get("bytes_per_second", False) else raw_data['benchmarks'][0].get("time_unit")
         matches = re.search(r".*(lib.*\.so(?:\.\d+)?).*",path.basename(files))
         if matches:
             data_set_name = matches[1]
@@ -57,6 +60,10 @@ def main():
             x=dataFrame.columns.difference(['name']),
             y=dataFrame['name'].str.extract(r"do_([\w_]*)(?:/threads:(\d))?_mean").dropna(axis=1).agg(':'.join, axis=1).str.replace("_", " ", regex=False),
             reversescale=(measurement == 'cpu_time'),
+            colorbar={
+                "ticksuffix": units,
+                "showticksuffix":"all"
+            }
             # colorscale='Viridis'
         )
     )
