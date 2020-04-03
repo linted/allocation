@@ -71,10 +71,6 @@ urlcolor=\linkcolours}
 
 \usepackage[]{placeins}
 
-% \usepackage{epstopdf}
-% \epstopdfDeclareGraphicsRule{.tif}{png}{.png}{convert #1 \OutputFile}
-% \AppendGraphicsExtensions{.tif}
-
 \newcommand\extraspace{3pt}
 
 \usepackage{placeins}
@@ -114,34 +110,11 @@ urlcolor=\linkcolours}
 
 \newcommand*\todo[0]{\textcolor{red}{TODO }}
 
-%\usepackage[1,2,3,5,6,7]{pagesel} %Discard page 4 as it is blank
-
-% The following packages can be found on http:\\www.ctan.org
-%\usepackage{graphics} % for pdf, bitmapped graphics files
-%\usepackage{epsfig} % for postscript graphics files
-%\usepackage{mathptmx} % assumes new font selection scheme installed
-%\usepackage{times} % assumes new font selection scheme installed
-%\usepackage{amsmath} % assumes amsmath package installed
-%\usepackage{amssymb}  % assumes amsmath package installed
 
 \title{\LARGE \bf
 Stack and Heap Allocations: A Cost Comparison
 }
 
-%\author{ \parbox{3 in}{\centering Huibert Kwakernaak*
-%         \thanks{*Use the $\backslash$thanks command to put information here}\\
-%         Faculty of Electrical Engineering, Mathematics and Computer Science\\
-%         University of Twente\\
-%         7500 AE Enschede, The Netherlands\\
-%         {\tt\small h.kwakernaak@autsubmit.com}}
-%         \hspace*{ 0.5 in}
-%         \parbox{3 in}{ \centering Pradeep Misra**
-%         \thanks{**The footnote marks may be inserted manually}\\
-%        Department of Electrical Engineering \\
-%         Wright State University\\
-%         Dayton, OH 45435, USA\\
-%         {\tt\small pmisra@cs.wright.edu}}
-%}
 
 \author{Michael D. Merrill$^{1}$% <-this % stops a space
 \thanks{$^{1}$Michael is a Masters student in Computer Sciences, Georgia Tech,
@@ -184,14 +157,6 @@ Care is taken to ensure that tests do not favor one method over another through 
 The test algorithms are designed to mimic common, real world use cases of allocated memory as well as the academic and theoretical maximums of each allocation type. 
 
 
-% \begin{figure}[tbp]
-% \centering
-% \includegraphics[width=0.97\columnwidth]{loss_spikes.png}
-% \caption{ Learning curve with high loss spikes that excessively perturb a trainable parameter distribution. Losses decrease after loss spikes as parameters are updated back to an intelligent distribution. The learning curve is 2500 iteration boxcar averaged. }
-% \label{loss_spikes}
-% \end{figure}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Algorithms}
 
@@ -204,17 +169,10 @@ This is continued until the test is finished; a time determined by the experimen
 \begin{algorithm}[h]
 \caption{Allocation with Light Usage}
 \begin{algorithmic}
-% \STATE let $T$ be the total number of successful iterations
-% \STATE let $0 < S$ be the number of bytes allocated
-% \STATE let $0 \leq R \leq S$ a random index to test
-% \STATE let $0 < C$
+
 \WHILE{test is not finished}
   \STATE $M \leftarrow allocate(S)$
-  % \IF{$M_\text{R} \neq C $}
   \STATE $M_\text{R} \leftarrow C$
-  % \STATE $T \leftarrow T + 1$
-%   \ELSE\STATE $C$
-  % \ENDIF
   \STATE $deallocate(M)$
 \ENDWHILE
 \end{algorithmic}
@@ -235,7 +193,6 @@ Once again, the algorithm loops until a stop condition is met.
       \STATE $M_\text{R1} \leftarrow C$
       \STATE $M_\text{R2} \leftarrow C$
       \STATE $M_\text{R3} \leftarrow C$
-      % \STATE $T \leftarrow T + 1$
       \STATE $deallocate(M)$
     \ENDWHILE
   \end{algorithmic}
@@ -256,7 +213,6 @@ The loop continues until the test is finished, and the socket is closed.
     \WHILE{test is not finished}
       \STATE $M \leftarrow allocate(S)$
       \STATE $M_\text{R} \leftarrow read(C)$
-      % \STATE $T \leftarrow T + 1$
       \STATE $deallocate(M)$
     \ENDWHILE
     \STATE $close(C)$
@@ -268,7 +224,8 @@ The loop continues until the test is finished, and the socket is closed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment Methodologies}
-Google's open source Benchmark library is a `microbenchmark' framework developed using the Google Test suite. Benchmark provides a comprehensive environment to gauge code snippet performance with an independent and repeatable approach.
+Google's open source Benchmark library is a ``microbenchmark'' framework developed using the Google Test suite.
+Benchmark provides a comprehensive environment to gauge code snippet performance with an independent and repeatable approach.
 Each benchmark handler is written in \textbf{C++} and handles the test setup and teardown functionality.
 The portion of code which is being evaluated is written in \textbf{C} to minimize overhead associated with higher level languages, and to produce binary output which is verifiably identical to the associated algorithms.
 
@@ -277,7 +234,7 @@ Each item in this set was chosen to provide an equal and full comparison between
 The set of tests can thus be divided into two groups, initialized and uninitialized allocations.
 Care is taken when discussing test results to ensure comparisons are conducted only between groups or individual members of a group to more accurately portray results of real world usage. 
 
-The tests are measued using various allocation sizes.
+The tests are measured using various allocation sizes.
 These sizes include \textit{32, 256, 4096, 32768} bytes referred to as small, medium, large, and Huge respectively.
 For each experiment the set of tests are also evaluated across multiple dynamic allocation implementations.
 The set of allocators include \textit{glibc, ptmalloc, jemalloc, tcmalloc,} and \textit{hoard}.
@@ -297,11 +254,12 @@ Fig. \ref{algo1_complete_hist} shows a comparison of the relative speed differen
 
 \begin{figure}[tbh!]
   \centering
-  \includegraphics[width=\columnwidth]{graphs/light_hist1.png}
+  \includegraphics[width=\columnwidth]{graphs/light_hist.png}
   \caption{ Comparison of allocation methods in nano seconds }
   \label{algo1_complete_hist}
 \end{figure} 
 
+Taking a closer look at 
 Fig. \ref{algo1_libc.so.6_bar} shows a speed comparison for libc.so.6, and is broken into separate graphs based on the allocation size.
 This figure clearly shows the progressive time increases that both calloc and initialized stack allocations go through as the allocation size increases.
 It should also be noted that malloc and uninitialized stack allocations have relatively fixed performance costs.
@@ -309,54 +267,129 @@ It should also be noted that malloc and uninitialized stack allocations have rel
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{{graphs/light_libc.so.6_1s_20}.png} %stupid .'s in file names
-  \caption{ Performance differences in libc.so.6 between allocation methods at various sizes (Nano Seconds) }
+  \caption{ Performance differences in libc.so.6 between allocation methods at various sizes }
   \label{algo1_libc.so.6_bar}
 \end{figure} 
 
+Fig. \ref{algo1_stack_malloc_hist} shows that for Algorithm \ref{light_usage_algorithm} has consistent performance in stack allocation.
+It also shows the difference in performance of malloc across allocation libraries.
+For most allocation libraries, the difference in performance between stack and malloc allocation is minimal.
+
 \begin{figure}[tbh!]
   \centering
-  \includegraphics[width=\columnwidth]{graphs/light_stack_malloc_hist1.png}
-  \caption{ Comparison of allocation methods in nano seconds }
+  \includegraphics[width=\columnwidth]{graphs/light_stack_malloc_hist.png}
+  \caption{ Stack and Malloc execution times using Algo. \ref{light_usage_algorithm} } 
   \label{algo1_stack_malloc_hist}
 \end{figure}
 
+\todo explain why loop unwinding is giving initialized stack an advantage over calloc in \ref{algo1_init_calloc_hist}.
+
 \begin{figure}[tbh!]
   \centering
-  \includegraphics[width=\columnwidth]{graphs/light_init_calloc_hist1.png}
-  \caption{ Comparison of allocation methods in nano seconds }
+  \includegraphics[width=\columnwidth]{graphs/light_init_calloc_hist.png}
+  \caption{ Initialized Stack and Calloc execution times using Algo. \ref{light_usage_algorithm} }
   \label{algo1_init_calloc_hist}
 \end{figure} 
 
+\todo Fig. \ref{algo1_complete_threaded_hist}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/light_threaded_hist.png}
+  \caption{ \todo }
+  \label{algo1_complete_threaded_hist}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment: Algorithm \ref{struct_usage_algorithm}}
 
+\todo talk about the overall results in this section referencing Fig. \ref{algo2_complete_hist}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/struct_hist.png}
+  \caption{ Comparison of allocation methods in nano seconds }
+  \label{algo2_complete_hist}
+\end{figure} 
+
+\todo Fig. \ref{algo2_complete_threaded_hist}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/struct_threaded_hist.png}
+  \caption{ \todo  test}
+  \label{algo2_complete_threaded_hist}
+\end{figure}
+
+\todo talk about how stack and malloc compare in Fig. \ref{algo2_stack_malloc_hist}.
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/struct_stack_malloc_hist.png}
+  \caption{ \todo Should this be a bar graph? }
+  \label{algo2_stack_malloc_hist}
+\end{figure}
+
+\todo talk about why calloc is so much slower then initalized stack in Fig. \ref{algo2_init_calloc_hist}.
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/struct_init_calloc_hist.png}
+  \caption{ \todo Should this be a bar graph? }
+  \label{algo2_init_calloc_hist}
+\end{figure} 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment: Algorithm \ref{network_usage_algorithm}}
+
+\todo Fig. \ref{algo3_complete_hist}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/sporatic_hist.png}
+  \caption{ \todo }
+  \label{algo3_complete_hist}
+\end{figure}
+
+\todo Fig. \ref{algo3_complete_threaded_hist}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/sporatic_threaded_hist.png}
+  \caption{ \todo }
+  \label{algo3_complete_threaded_hist}
+\end{figure}
+
+
+\todo Fig. \ref{algo3_stack_malloc_hist}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/sporatic_stack_malloc_hist.png}
+  \caption{ \todo }
+  \label{algo3_stack_malloc_hist}
+\end{figure}
+
+\todo Fig. \ref{algo3_init_calloc_hist}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/sporatic_init_calloc_hist.png}
+  \caption{ \todo }
+  \label{algo3_init_calloc_hist}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 
-% Taken together, our CIFAR-10 supersampling results show that ALRC improves stability and lowers losses for learning that would be destabilized by loss spikes and otherwise has little effect. Loss spikes are often encountered when training with high learning rates, high order loss functions or small batch sizes. However, a moderate learning rate was used in MSE experiments so losses did not spike enough to destabilize learning. In contrast, mean quartic error training is unstable so ALRC stabilizes training and lowers losses. Similar results are confirmed for partial-STEM where ALRC stabilizes learning and lowers losses.
-
-% ALRC is designed to complement existing learning algorithms with new functionality. It is effective for any loss function or batch size and can be applied to any neural network trained with a variant of stochastic gradient descent. Our algorithm is also computationally inexpensive, requiring orders of magnitude fewer operations than other layers typically used in neural networks. As ALRC either stabilizes learning or has little effect, this means that it is suitable for routine application to arbitrary neural network training with SGD. In addition, we note that ALRC is a simple algorithm that has a clear effect on learning.
-
-% Nevertheless, ALRC can replace other learning algorithms in some situations. For instance, ALRC is a computationally inexpensive alternative to gradient clipping in high batch size training where gradient clipping is being used to limit perturbations by loss spikes. However, it is not a direct replacement as ALRC preserves the distribution of backpropagated gradients whereas gradient clipping reduces large gradients. Instead, ALRC is designed to complement gradient clipping by limiting perturbations by large losses while gradient clipping modifies gradient distributions.
-
-% The implementation of ALRC in algorithm~\ref{alrc_algorithm} is for positive losses. This avoids the need to introduce small constants to prevent divide-by-zero errors. Nevertheless, ALRC can support negative losses by using standard methods to prevent divide by zero errors. Alternatively, a constant can be added to losses to make them positive without affecting learning.
-
-% ALRC can also be extended to limit losses more than a number of standard deviations below their mean. This had no effect in our experiments. However, preemptively reducing loss spikes by clipping rewards between user-provided upper and lower bounds can improve reinforcement learning\cite{mnih2015human}. Subsequently, we suggest that clipping losses below their means did not improve learning because losses mainly spiked above their means; not below. Some partial-STEM losses did spike below; however, they were mainly for blank or otherwise trivial completions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
-% We have developed ALRC to stabilize the training of artificial neural networks by limiting backpropagated losses. Our experiments show that ALRC accelerates convergence and lowers losses for learning that would be destabilized by loss spikes and otherwise has little effect. Further, ALRC is computationally inexpensive, can be applied to any loss function or batch size, does not affect the distribution of backpropagated gradients and has a clear effect on learning. Overall, ALRC complements existing learning algorithms and can be routinely applied to arbitrary neural network training with SGD.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Source Code}
 
 Source code for all experiments detailed in this paper can be found at \url{\GitHubLoc}.
-
-% ALRC increases the rate of convergence and decreases losses for otherwise unstable training by limiting loss spikes. If learning is already stable, it has little affect. Our algorithm is computationally inexpensive, robust to hyperparameter choices and can be applied to any loss function or batch size without affecting backpropagated gradient distributions. It follows that ALRC complements existing learning algorithms and can be applied to any artificial neural network trained with SGD.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Additional Figures}
