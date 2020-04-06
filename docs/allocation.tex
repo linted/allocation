@@ -259,10 +259,11 @@ Fig. \ref{algo1_complete_hist} shows a comparison of the relative speed differen
   \label{algo1_complete_hist}
 \end{figure} 
 
-Taking a closer look at 
-Fig. \ref{algo1_libc.so.6_bar} shows a speed comparison for libc.so.6, and is broken into separate graphs based on the allocation size.
-This figure clearly shows the progressive time increases that both calloc and initialized stack allocations go through as the allocation size increases.
-It should also be noted that malloc and uninitialized stack allocations have relatively fixed performance costs.
+
+Fig. \ref{algo1_libc.so.6_bar} shows a better comparison of allocation times by organizing the results of a single library by allocation size.
+From the speed comparison for libc.so.6, it becomes evident that calloc is generally the slowest and normal stack allocation is a constant speed across all allocation sizes.
+This figure also shows the progressive time increases that both calloc and initialized stack allocations go through as the allocation size increases.
+It should also be noted that malloc and uninitialized stack allocations have relatively fixed performance costs, despite a small speed decrease in malloc when the size changes from medium to large.
 
 \begin{figure}[tbh!]
   \centering
@@ -271,9 +272,14 @@ It should also be noted that malloc and uninitialized stack allocations have rel
   \label{algo1_libc.so.6_bar}
 \end{figure} 
 
-Fig. \ref{algo1_stack_malloc_hist} shows that for Algorithm \ref{light_usage_algorithm} has consistent performance in stack allocation.
-It also shows the difference in performance of malloc across allocation libraries.
-For most allocation libraries, the difference in performance between stack and malloc allocation is minimal.
+Algorithm \ref{light_usage_algorithm} has consistent performance across all allocation sizes when allocating on the stack.
+Fig. \ref{algo1_stack_malloc_hist} shows a relative comparison between stack allocation and the efficiency of malloc.
+From this figure, the performance of malloc across allocation libraries is shown to vary greatly depending on the size of the allocation.
+For most allocation libraries, the difference in performance between stack and malloc allocation is minimal, however some allocation libraries.
+
+The main reason for the relatively constant allocation times for malloc is due to the performance improvements that the allocation libraries implemented.
+Most allocation libraries implement chunk bins in some fashion.\footnote{\href{https://sourceware.org/glibc/wiki/MallocInternals\#Arenas\_and\_Heaps}{glibc heap bin explanation}}
+Use of bins keeps allocation times relatively constant since previously allocated chunks can be easily retrieved from a bin without needed to go through the full allocaiton process.
 
 \begin{figure}[tbh!]
   \centering
@@ -282,7 +288,16 @@ For most allocation libraries, the difference in performance between stack and m
   \label{algo1_stack_malloc_hist}
 \end{figure}
 
-\todo explain why loop unwinding is giving initialized stack an advantage over calloc in \ref{algo1_init_calloc_hist}.
+The difference in performance between initialization stack allocation and calloc is the time of uninitialized allocation plus the cost of initialization.
+However, looking at Fig. \ref{algo1_libc.so.6_bar} initialized stack allocation does not appear to be following this rule.
+This is due to the compiler optimizations which perform loop unwinding during initialization of the stack.
+Loop unwinding for reasonably small allocations can be performed with a store of $0$ using an MMX register or other sufficiently large register.
+This is what allows initialized stack allocation for small allocations to perform on par with uninitialized stack allocaitons in the small allocaiton tests.
+
+Applying the idea of loop unwinding to calloc however does not work, as see in Fig. \ref{algo1_init_calloc_hist}.
+Since calloc is an external library, it is unable to benefit from the compiler optimizations that the initialized stack allocaiton does.
+The main reason for this is that calloc is written in such a way so as to allow for general purpose allocaiton, and can therefore accommodate any size of allocation with a single function.
+Loop unwinding requires knowledge of the size of the allocation so as to unwind the appropriate number of times without overrunning or underrunning the buffer. 
 
 \begin{figure}[tbh!]
   \centering
@@ -291,13 +306,22 @@ For most allocation libraries, the difference in performance between stack and m
   \label{algo1_init_calloc_hist}
 \end{figure} 
 
-\todo Fig. \ref{algo1_complete_threaded_hist}
+Taking a look at performance in a multithreaded environment, Fig. \ref{algo1_stack_malloc_threaded_hist} shows how stack and malloc allocaitons perform.
+
+\todo \url{https://sourceware.org/glibc/wiki/MallocInternals#Thread_Local_Cache_.28tcache.29}
 
 \begin{figure}[tbh!]
   \centering
-  \includegraphics[width=\columnwidth]{graphs/light_threaded_hist.png}
+  \includegraphics[width=\columnwidth]{graphs/light_stack_malloc_threaded_hist.png}
+  \caption{ Comparison of stack and malloc allocations during multithreaded execution }
+  \label{algo1_stack_malloc_threaded_hist}
+\end{figure}
+
+\begin{figure}[tbh!]
+  \centering
+  \includegraphics[width=\columnwidth]{graphs/light_init_calloc_threaded_hist.png}
   \caption{ \todo }
-  \label{algo1_complete_threaded_hist}
+  \label{algo1_init_calloc_threaded_hist}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
