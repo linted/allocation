@@ -237,7 +237,7 @@ Care is taken when discussing test results to ensure comparisons are conducted o
 The tests are measured using various allocation sizes.
 These sizes include \textit{32, 256, 4096, 32768} bytes referred to as small, medium, large, and Huge respectively.
 For each experiment the set of tests are also evaluated across multiple dynamic allocation implementations.
-The set of allocators include \textit{glibc, ptmalloc, jemalloc, tcmalloc,} and \textit{hoard}.
+The set of allocators include \textit{glibc, ptmalloc, jemalloc,} and \textit{tcmalloc}. %and \textit{hoard}.
 This cross section of commonly used general purpose allocators are run independently through dynamic loading.
 
 \todo Do I need to talk about the threaded tests?
@@ -292,13 +292,12 @@ The difference in performance between initialization stack allocation and calloc
 However, looking at Fig. \ref{algo1_libc.so.6_bar} initialized stack allocation does not appear to be following this rule.
 This is due to the compiler optimizations which perform loop unwinding during initialization of the stack.
 Loop unwinding for reasonably small allocations can be performed with a store of $0$ using an MMX register or other sufficiently large register.
-This is what allows initialized stack allocation for small allocations to perform on par with uninitialized stack allocaitons in the small allocaiton tests.
+This is what allows initialized stack allocation for small allocations to perform on par with uninitialized stack allocations in the small allocation tests.
 
 Applying the idea of loop unwinding to calloc however does not work, as see in Fig. \ref{algo1_init_calloc_hist}.
-Since calloc is an external library, it is unable to benefit from the compiler optimizations that the initialized stack allocaiton does.
-The main reason for this is that calloc is written in such a way so as to allow for general purpose allocaiton, and can therefore accommodate any size of allocation with a single function.
+Since calloc is an external library, it is unable to benefit from the compiler optimizations that the initialized stack allocation does.
+The main reason for this is that calloc is written in such a way so as to allow for general purpose allocation, and can therefore accommodate any size of allocation with a single function.
 Loop unwinding requires knowledge of the size of the allocation so as to unwind the appropriate number of times without overrunning or underrunning the buffer. 
-
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_init_calloc_hist.png}
@@ -306,9 +305,12 @@ Loop unwinding requires knowledge of the size of the allocation so as to unwind 
   \label{algo1_init_calloc_hist}
 \end{figure} 
 
-Taking a look at performance in a multithreaded environment, Fig. \ref{algo1_stack_malloc_threaded_hist} shows how stack and malloc allocaitons perform.
-
-\todo \url{https://sourceware.org/glibc/wiki/MallocInternals#Thread_Local_Cache_.28tcache.29}
+Multithreaded execution can have a large effect on perform, both positively and negatively.
+Fig. \ref{algo1_stack_malloc_threaded_hist} shows how stack and malloc allocations perform while being executed in a multithreaded environment.
+Comparing this figure with Fig. \ref{algo1_complete_hist}, it becomes apparent that while stack allocation speeds remain relatively consistent, malloc can suffer performance loss due to increased contention.
+However, most libraries remain performant when allocating small and medium sized chunks even at high thread counts.
+It should also be noted that the design of this test causes the greatest possible contention in dynamic allocation. 
+% \todo \url{https://sourceware.org/glibc/wiki/MallocInternals#Thread_Local_Cache_.28tcache.29}
 
 \begin{figure}[tbh!]
   \centering
