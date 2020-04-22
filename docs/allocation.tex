@@ -96,17 +96,10 @@ urlcolor=\linkcolours}
 \usepackage{listings}
 % code box settings
 \lstset{tabsize=4}
-% \lstdefinelanguage
-%    [x64]{Assembler}     % add a "x64" dialect of Assembler
-%    [x86masm]{Assembler} % based on the "x86masm" dialect
-%    % with these extra keywords:
-%    {morekeywords={CDQE,CQO,CMPSQ,CMPXCHG16B,JRCXZ,LODSQ,MOVSXD, %
-%                   POPFQ,PUSHFQ,SCASQ,STOSQ,IRETQ,RDTSCP,SWAPGS, %
-%                   rax,rdx,rcx,rbx,rsi,rdi,rsp,rbp, %
-%                   r8,r8d,r8w,r8b,r9,r9d,r9w,r9b, %
-%                   r10,r10d,r10w,r10b,r11,r11d,r11w,r11b, %
-%                   r12,r12d,r12w,r12b,r13,r13d,r13w,r13b, %
-%                   r14,r14d,r14w,r14b,r15,r15d,r15w,r15b}} % etc.
+\lstdefinelanguage
+   [x64]{Assembler}     % add a "x64" dialect of Assembler
+   % with these extra keywords:
+   {morekeywords={sub,rsp,xmm0,rdi,pxor,mov,movaps,callq,<,>,movb,add,retq}} % etc.
 
 \newcommand*\todo[0]{\textcolor{red}{TODO }}
 
@@ -250,12 +243,12 @@ The results shown are the average completion time or throughput of an algorithm 
 \section{Experiment: Algorithm \ref{light_usage_algorithm}}
 In order to obtain a baseline benchmark of allocation times, Algorithm \ref{light_usage_algorithm} is used with the various sizes of $S$.
 Fig. \ref{algo1_complete_hist} shows a comparison of the relative speed differences across the six allocation libraries.
-
+This figure is specifically highlighting the fastest average completion times across all allocation types.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_hist.png}
-  \caption{ Comparison of allocation methods in nano seconds }
+  \caption{ Algo. \ref{light_usage_algorithm}: Comparison of allocation methods in nano seconds }
   \label{algo1_complete_hist}
 \end{figure} 
 
@@ -268,7 +261,7 @@ It should also be noted that malloc and uninitialized stack allocations have rel
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{{graphs/light_libc.so.6_1s_20}.png} %stupid .'s in file names
-  \caption{ Performance differences in libc.so.6 between allocation methods at various sizes }
+  \caption{ Algo. \ref{light_usage_algorithm}: Performance differences in libc.so.6 between allocation methods at various sizes }
   \label{algo1_libc.so.6_bar}
 \end{figure} 
 
@@ -284,14 +277,14 @@ Use of bins keeps allocation times relatively constant since previously allocate
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_stack_malloc_hist.png}
-  \caption{ Stack and Malloc execution times using Algo. \ref{light_usage_algorithm} } 
+  \caption{ Algo. \ref{light_usage_algorithm}: Stack and Malloc execution times } 
   \label{algo1_stack_malloc_hist}
 \end{figure}
 
 The difference in performance between initialization stack allocation and calloc is the time of uninitialized allocation plus the cost of initialization.
 However, looking at Fig. \ref{algo1_libc.so.6_bar} initialized stack allocation does not appear to be following this rule.
 This is due to the compiler optimizations which perform loop unwinding during initialization of the stack.
-Loop unwinding for reasonably small allocations can be performed with a store of $0$ using an MMX register or other sufficiently large register.
+Loop unwinding for reasonably small allocations can be performed with a store of $0$ using an MMX register or other sufficiently large register, as seen in Fig. \ref{algo1_init_small_lst}.
 This is what allows initialized stack allocation for small allocations to perform on par with uninitialized stack allocations in the small allocation tests.
 
 Applying the idea of loop unwinding to calloc however does not work, as see in Fig. \ref{algo1_init_calloc_hist}.
@@ -301,79 +294,117 @@ Loop unwinding requires knowledge of the size of the allocation so as to unwind 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_init_calloc_hist.png}
-  \caption{ Initialized Stack and Calloc execution times using Algo. \ref{light_usage_algorithm} }
+  \caption{ Algo. \ref{light_usage_algorithm}: Initialized Stack and Calloc execution times }
   \label{algo1_init_calloc_hist}
 \end{figure} 
 
-Multithreaded execution can have a large effect on perform, both positively and negatively.
+\begin{figure}[tbh!]
+  \centering
+    \begin{lstlisting}[language={[x64]Assembler},frame=single]
+      sub    $0x28,%rsp
+      pxor   %xmm0,%xmm0
+      mov    %rsp,%rdi
+      movaps %xmm0,(%rsp)
+      movaps %xmm0,0x10(%rsp)
+      callq  0xa898 <do_nothing>
+      movb   $0x33,0x1f(%rsp)
+      add    $0x28,%rsp
+      retq   
+    \end{lstlisting}
+  \caption{ Dissasembly of stack\_initialized\_light\_small\_test }
+  \label{algo1_init_small_lst}
+\end{figure}
+
+
+Multithreaded execution is known to have a major role in a program's performance, both positively and negatively.
 Fig. \ref{algo1_stack_malloc_threaded_hist} shows how stack and malloc allocations perform while being executed in a multithreaded environment.
 Comparing this figure with Fig. \ref{algo1_complete_hist}, it becomes apparent that while stack allocation speeds remain relatively consistent, malloc can suffer performance loss due to increased contention.
 However, most libraries remain performant when allocating small and medium sized chunks even at high thread counts.
-It should also be noted that the design of this test causes the greatest possible contention in dynamic allocation. 
-% \todo \url{https://sourceware.org/glibc/wiki/MallocInternals#Thread_Local_Cache_.28tcache.29}
+It should also be noted that the design of this test causes the greatest possible contention in dynamic allocations due to the near constant allocation requests performed by each thread. 
+While many allocation libraries implement countermeasures to combat contention\footnote{\href{https://sourceware.org/glibc/wiki/MallocInternals\#Thread\_Local\_Cache\_.28tcache.29}{glibc thread local caches}}, there is still additional overhead which must be accounted for.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_stack_malloc_threaded_hist.png}
-  \caption{ Comparison of stack and malloc allocations during multithreaded execution }
+  \caption{ Algo. \ref{light_usage_algorithm}: Comparison of stack and malloc during multithreaded execution }
   \label{algo1_stack_malloc_threaded_hist}
 \end{figure}
+
+Fig. \ref{algo1_init_calloc_threaded_hist} compares initialized stack and calloc allocations in a multithreaded environment, the results are nearly the same as without threads.
+There is nearly identical performance across every library, thread count, and allocation.
+This shows that  the act of initializing memory is far more costly then performance loss due to contention.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_init_calloc_threaded_hist.png}
-  \caption{ \todo }
+  \caption{ Algo. \ref{light_usage_algorithm}: comparison of initalized stack and calloc during multithreaded execution }
   \label{algo1_init_calloc_threaded_hist}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment: Algorithm \ref{struct_usage_algorithm}}
 
-\todo talk about the overall results in this section referencing Fig. \ref{algo2_complete_hist}
+Algo. \ref{struct_usage_algorithm} provides a real world usage example where a struct is allocated and filled with data before being deallocated.
+This differs from Algo. \ref{light_usage_algorithm} in that it accesses every byte of the allocated memory, not only a small subsection.
+This pattern matches more closely to what would occur in a real program, rather then allocating and not using the memory.
+
+The overall comparisons between each individual allocation type, the trends seen in Algo. \ref{light_usage_algorithm} appear to hold.
+Fig. \ref{algo2_complete_hist} shows similar completion times for stack and malloc as well as with initalized stack and calloc.
+The results are nearly identical to what was seen in the small and medium allocation sizes for \ref{light_usage_algorithm}.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/struct_hist.png}
-  \caption{ Comparison of allocation methods in nano seconds }
+  \caption{ Algo. \ref{struct_usage_algorithm}: Comparison of allocation methods in nano seconds }
   \label{algo2_complete_hist}
 \end{figure} 
 
-\todo Fig. \ref{algo2_complete_threaded_hist}
+
+% \todo talk about how stack and malloc compare in Fig. \ref{algo2_stack_malloc_hist}.
+
+% \begin{figure}[tbh!]
+%   \centering
+%   \includegraphics[width=\columnwidth]{graphs/struct_stack_malloc_hist.png}
+%   \caption{ Algo. \ref{struct_usage_algorithm}: \todo Should this be a bar graph? }
+%   \label{algo2_stack_malloc_hist}
+% \end{figure}
+
+% \todo talk about why calloc is so much slower then initalized stack in Fig. \ref{algo2_init_calloc_hist}.
+
+% \begin{figure}[tbh!]
+%   \centering
+%   \includegraphics[width=\columnwidth]{graphs/struct_init_calloc_hist.png}
+%   \caption{ Algo. \ref{struct_usage_algorithm}: \todo Should this be a bar graph? }
+%   \label{algo2_init_calloc_hist}
+% \end{figure} 
+
+When comparing allocation times in Algo. \ref{light_usage_algorithm}, it was noted that there was a slight decrease in contention due to the time spent on intializing memory.
+Carrying this idea over, it is expected that, since every byte is being written to, there should be lower latency.
+In Fig. \ref{algo2_complete_threaded_hist}, this can be seen by overall faster average allocation speeds across all thread counts.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/struct_threaded_hist.png}
-  \caption{ \todo  test}
+  \caption{ Algo. \ref{struct_usage_algorithm}: Threaded comparison of struct allocations }
   \label{algo2_complete_threaded_hist}
 \end{figure}
-
-\todo talk about how stack and malloc compare in Fig. \ref{algo2_stack_malloc_hist}.
-
-\begin{figure}[tbh!]
-  \centering
-  \includegraphics[width=\columnwidth]{graphs/struct_stack_malloc_hist.png}
-  \caption{ \todo Should this be a bar graph? }
-  \label{algo2_stack_malloc_hist}
-\end{figure}
-
-\todo talk about why calloc is so much slower then initalized stack in Fig. \ref{algo2_init_calloc_hist}.
-
-\begin{figure}[tbh!]
-  \centering
-  \includegraphics[width=\columnwidth]{graphs/struct_init_calloc_hist.png}
-  \caption{ \todo Should this be a bar graph? }
-  \label{algo2_init_calloc_hist}
-\end{figure} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment: Algorithm \ref{network_usage_algorithm}}
 
-\todo Fig. \ref{algo3_complete_hist}
+While Algo. \ref{struct_usage_algorithm}'s struct usage is the natural progression from towards real world usage after Algo. \ref{light_usage_algorithm}, there is still room for improvement.
+Most small allocations are used to create structs or similar data structures, whereas large allocations are generally used in I/O operations.
+Therefore Algo \ref{network_usage_algorithm} simulates network usage by reading as much as possible from a socket into an allocated buffer.
+This test is implemented by running a \textbf{ncat} server which executes off a new instance of the \textbf{yes} linux program whenever it receives a new connection.
+
+The results of this experiment show interesting results which may come as a surprise compared to previous experiments.
+Fig. \ref{algo3_complete_hist} shows how larger allocation sizes, even if they are slower to allocate, have significantly higher throughput during network operations.
+
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_hist.png}
-  \caption{ \todo }
+  \caption{ Algo \ref{network_usage_algorithm}: Comparison of network transfer speed across allocation types. results in Billion Bytes per Second. }
   \label{algo3_complete_hist}
 \end{figure}
 
@@ -382,7 +413,7 @@ It should also be noted that the design of this test causes the greatest possibl
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_threaded_hist.png}
-  \caption{ \todo }
+  \caption{ Algo \ref{network_usage_algorithm}: }
   \label{algo3_complete_threaded_hist}
 \end{figure}
 
@@ -392,7 +423,7 @@ It should also be noted that the design of this test causes the greatest possibl
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_stack_malloc_hist.png}
-  \caption{ \todo }
+  \caption{ Algo \ref{network_usage_algorithm}: }
   \label{algo3_stack_malloc_hist}
 \end{figure}
 
@@ -401,7 +432,7 @@ It should also be noted that the design of this test causes the greatest possibl
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_init_calloc_hist.png}
-  \caption{ \todo }
+  \caption{ Algo \ref{network_usage_algorithm}: }
   \label{algo3_init_calloc_hist}
 \end{figure}
 
