@@ -395,11 +395,10 @@ In Fig. \ref{algo2_complete_threaded_hist}, this can be seen by overall faster a
 While Algo. \ref{struct_usage_algorithm}'s struct usage is the natural progression from towards real world usage after Algo. \ref{light_usage_algorithm}, there is still room for improvement.
 Most small allocations are used to create structs or similar data structures, whereas large allocations are generally used in I/O operations.
 Therefore Algo \ref{network_usage_algorithm} simulates network usage by reading as much as possible from a socket into an allocated buffer.
-This test is implemented by running a \textbf{ncat} server which executes off a new instance of the \textbf{yes} linux program whenever it receives a new connection.
+This test is implemented by running a local \textbf{ncat} server which executes off a new instance of the \textbf{yes} linux program whenever it receives a new connection.
 
 The results of this experiment show interesting results which may come as a surprise compared to previous experiments.
 Fig. \ref{algo3_complete_hist} shows how larger allocation sizes, even if they are slower to allocate, have significantly higher throughput during network operations.
-
 
 \begin{figure}[tbh!]
   \centering
@@ -408,40 +407,50 @@ Fig. \ref{algo3_complete_hist} shows how larger allocation sizes, even if they a
   \label{algo3_complete_hist}
 \end{figure}
 
-\todo Fig. \ref{algo3_complete_threaded_hist}
+Similarly when Algo \ref{network_usage_algorithm} is run in parallel threads, we see increased throughput for larger allocation sizes.
+The increased allocation latency that has been seen in Algo. \ref{light_usage_algorithm}, becomes irrelevant when compared to the speed of network operations.
+Another interesting point of note in Fig. \ref{algo3_complete_threaded_hist} is the decrease in throughput as the threadcount increases.
+This tends to affect all allocation types equally, and is due to kernel overheads involved with the volume of network traffic being generated and consumed.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_threaded_hist.png}
-  \caption{ Algo \ref{network_usage_algorithm}: }
+  \caption{ Algo \ref{network_usage_algorithm}: Network throughput in threaded environment}
   \label{algo3_complete_threaded_hist}
 \end{figure}
 
-
-\todo Fig. \ref{algo3_stack_malloc_hist}
+Looking specifically at stack and malloc allocaiton in Fig. \ref{algo3_stack_malloc_hist}, there is minimal difference between the two within the allocation sizes.
+Similarly initalized stack and calloc have network through puts across the allocation sizes in Fig. \ref{algo3_init_calloc_hist}.
+This reinforces that the speed of the allocation pales in comparison to how it is being used.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_stack_malloc_hist.png}
-  \caption{ Algo \ref{network_usage_algorithm}: }
+  \caption{ Algo \ref{network_usage_algorithm}: stack and malloc network throughput comparison }
   \label{algo3_stack_malloc_hist}
 \end{figure}
-
-\todo Fig. \ref{algo3_init_calloc_hist}
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_init_calloc_hist.png}
-  \caption{ Algo \ref{network_usage_algorithm}: }
+  \caption{ Algo \ref{network_usage_algorithm}: initalized stack and calloc network throughput comparison }
   \label{algo3_init_calloc_hist}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Discussion}
+% \section{Discussion}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
+The empirical latency of allocation operations was shown in Algo. \ref{light_usage_algorithm}.
+With Algo. \ref{struct_usage_algorithm} the short term simple usage of memory was put on display.
+Finally in Algo. \ref{network_usage_algorithm}, a comparison of allocation speed and IO operations was presented.
+
+With all this data, there is a few conclusions which can be drawn.
+To begin, malloc and calloc are empirically slower then stack and initalized stack allocations.
+When used locally the allocation latency tends to outweigh the cost of writing to memory until the memory size becomes significantly large.
+Finally when allocaiton latency is vastly outweighed by IO operations and syscalls.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Source Code}
