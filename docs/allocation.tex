@@ -114,6 +114,8 @@ Stack and Heap Allocations: A Cost Comparison
 and a developer for the }%
 }
 
+% \widowpenalties 1 10000
+% \raggedbottom
 
 \begin{document}
 
@@ -213,7 +215,6 @@ The loop continues until the test is finished, and the socket is closed.
   \label{network_usage_algorithm}
 \end{algorithm}
 
-\todo closing notes about algorithms?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment Methodologies}
@@ -233,11 +234,13 @@ For each experiment the set of tests are also evaluated across multiple dynamic 
 The set of allocators include \textit{glibc, ptmalloc, jemalloc,} and \textit{tcmalloc}. %and \textit{hoard}.
 This cross section of commonly used general purpose allocators are run independently through dynamic loading.
 
-\todo Do I need to talk about the threaded tests?
+In order to evaluate each algorithm in multithreaded environments, each test is run with a number of concurrent threads.
+Each test is initially run in a threadless environment for every baseline execution.
+After the tests have been completed singly threaded, a multithreaded set of tests is run.
+These tests include running each algorithm with 1, 2, 4, and 8 threads to compare performance.
 
 All experiments are run on a dedicated VPS with $4 \times 2693.67$ MHz CPUs and $8$GB of ram.
 The results shown are the average completion time or throughput of an algorithm after being run for 20 iterations with a minimum of 1 second per iteration.
-\todo do I need to say more about the test machine?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment: Algorithm \ref{light_usage_algorithm}}
@@ -419,8 +422,9 @@ This tends to affect all allocation types equally, and is due to kernel overhead
   \label{algo3_complete_threaded_hist}
 \end{figure}
 
-Looking specifically at stack and malloc allocaiton in Fig. \ref{algo3_stack_malloc_hist}, there is minimal difference between the two within the allocation sizes.
-Similarly initalized stack and calloc have network through puts across the allocation sizes in Fig. \ref{algo3_init_calloc_hist}.
+\pagebreak
+Looking specifically at stack and malloc allocation in Fig. \ref{algo3_stack_malloc_hist}, there is minimal difference between the two within the allocation sizes.
+Similarly initialized stack and calloc have network through puts across the allocation sizes in Fig. \ref{algo3_init_calloc_hist}.
 This reinforces that the speed of the allocation pales in comparison to how it is being used.
 
 \begin{figure}[tbh!]
@@ -450,7 +454,7 @@ Finally in Algo. \ref{network_usage_algorithm}, a comparison of allocation speed
 With all this data, there is a few conclusions which can be drawn.
 To begin, malloc and calloc are empirically slower then stack and initalized stack allocations.
 When used locally the allocation latency tends to outweigh the cost of writing to memory until the memory size becomes significantly large.
-Finally when allocaiton latency is vastly outweighed by IO operations and syscalls.
+Finally when allocation latency is vastly outweighed by IO operations and syscalls.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Source Code}
@@ -458,7 +462,7 @@ Finally when allocaiton latency is vastly outweighed by IO operations and syscal
 Source code for all experiments detailed in this paper can be found at \url{\GitHubLoc}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Additional Figures}
+% \section{Additional Figures}
 
 % \begin{figure}[tbp]
 % \centering
