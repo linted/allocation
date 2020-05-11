@@ -111,7 +111,7 @@ Stack and Heap Allocations: A Cost Comparison
 
 \author{Michael D. Merrill$^{1}$% <-this % stops a space
 \thanks{$^{1}$Michael is a Masters student in Computer Sciences, Georgia Tech,
-and a developer for the }%
+and a developer for the  }%
 }
 
 % \widowpenalties 1 10000
@@ -271,11 +271,11 @@ It should also be noted that malloc and uninitialized stack allocations have rel
 Algorithm \ref{light_usage_algorithm} has consistent performance across all allocation sizes when allocating on the stack.
 Fig. \ref{algo1_stack_malloc_hist} shows a relative comparison between stack allocation and the efficiency of malloc.
 From this figure, the performance of malloc across allocation libraries is shown to vary greatly depending on the size of the allocation.
-For most allocation libraries, the difference in performance between stack and malloc allocation is minimal, however some allocation libraries.
+For most allocation libraries, the difference in performance between stack and malloc allocation is minimal, however some allocation libraries have slightly higher performance costs then others.
 
 The main reason for the relatively constant allocation times for malloc is due to the performance improvements that the allocation libraries implemented.
 Most allocation libraries implement chunk bins in some fashion.\footnote{\href{https://sourceware.org/glibc/wiki/MallocInternals\#Arenas\_and\_Heaps}{glibc heap bin explanation}}
-Use of bins keeps allocation times relatively constant since previously allocated chunks can be easily retrieved from a bin without needed to go through the full allocaiton process.
+Use of bins keeps allocation times relatively constant since previously allocated chunks can be easily retrieved from a bin without needed to go through the full allocation process.
 
 \begin{figure}[tbh!]
   \centering
@@ -451,12 +451,12 @@ The empirical latency of allocation operations was shown in Algo. \ref{light_usa
 With Algo. \ref{struct_usage_algorithm} the short term simple usage of memory was put on display.
 Finally in Algo. \ref{network_usage_algorithm}, a comparison of allocation speed and IO operations was presented.
 
-With all this data, there is a few conclusions which can be drawn.
+With all this data, there are a few conclusions which can be drawn.
 To begin, malloc and calloc are empirically slower then stack and initalized stack allocations.
 When used locally the allocation latency tends to outweigh the cost of writing to memory until the memory size becomes significantly large.
 % Finally when allocation latency is vastly outweighed by system calls and IO operations, the performance of the allocation operation becomes irrelevant.
 As the system becomes increasingly IO bound, the relative impact of the memory allocator approaches zero.
-Finally, using a dynamic memory allocator the application gains the flexibility of not over allocating in the stack, or requiring the use of variable length arrays.
+Finally, by using a dynamic memory allocator the application gains the flexibility of not over allocating in the stack, or requiring the use of variable length arrays.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Source Code}
