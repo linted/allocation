@@ -454,7 +454,9 @@ Finally in Algo. \ref{network_usage_algorithm}, a comparison of allocation speed
 With all this data, there is a few conclusions which can be drawn.
 To begin, malloc and calloc are empirically slower then stack and initalized stack allocations.
 When used locally the allocation latency tends to outweigh the cost of writing to memory until the memory size becomes significantly large.
-Finally when allocation latency is vastly outweighed by IO operations and syscalls.
+% Finally when allocation latency is vastly outweighed by system calls and IO operations, the performance of the allocation operation becomes irrelevant.
+As the system becomes increasingly IO bound, the relative impact of the memory allocator approaches zero.
+Finally, using a dynamic memory allocator the application gains the flexibility of not over allocating in the stack, or requiring the use of variable length arrays.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Source Code}
@@ -472,9 +474,9 @@ Source code for all experiments detailed in this paper can be found at \url{\Git
 % \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Acknowledgements}
+% \section{Acknowledgements}
 
-\noindent This research was funded by .
+% \noindent This research was funded by .
 
 \clearpage
 
