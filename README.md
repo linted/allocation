@@ -11,6 +11,7 @@ The following programs are required to build this project
 - texlive (may require texlive-full)
 - libtool
 - automake
+- ncat (for running a server during sporadic tests)
 
 ## Build
 ```
@@ -34,6 +35,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DNO_DOCS=true
 ## Run all tests and generate data
 ```
 cd build/bin
+ncat -knlp 4000 -e /bin/yes &
 ./run_tests.sh
 ```
 
