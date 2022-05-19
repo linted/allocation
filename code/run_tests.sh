@@ -74,7 +74,7 @@ trap 'cleanup $ncat_pid' SIGINT
 # make the output dir if it doesn't exist
 mkdir -p output
 
-ALLOCATION_LIBRARIES="libdlmalloc.so libhoard.so libptmalloc3.so libjemalloc.so.2 libtcmalloc_minimal.so libc.so.6"
+ALLOCATION_LIBRARIES="libdlmalloc.so libhoard.so libptmalloc3.so libjemalloc.so.2 libtcmalloc_minimal.so libc.so.6 libsnmallocshim.so"
 for allocator in $ALLOCATION_LIBRARIES; do
     echo Starting work on $allocator
 

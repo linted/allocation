@@ -9,7 +9,8 @@ The following programs are required to build this project
 - cmake
 - git
 - texlive (may require texlive-full)
-
+- libtool
+- automake
 
 ## Build
 ```
@@ -25,9 +26,15 @@ turn off building of docs by changing the cmake command to:
 cmake .. -DCMAKE_BUILD_TYPE=Release -DNO_DOCS=true
 ```
 
-## Run
+## Run a single test
 ```
 ./build/code/light_usage_test --benchmark_repetitions=10 --benchmark_display_aggregates_only=true --benchmark_out=./light_usage_test.results --benchmark_out_format=json
+```
+
+## Run all tests and generate data
+```
+cd build/bin
+./run_tests.sh
 ```
 
 ## Display results

@@ -71,3 +71,9 @@ add_library(dlmalloc SHARED dlmalloc/source/dlmalloc.c)
 add_library(dlmalloc_threadsafe SHARED dlmalloc/source/dlmalloc.c)
 target_compile_definitions(dlmalloc_threadsafe PUBLIC USE_LOCKS)
 install(TARGETS dlmalloc_threadsafe dlmalloc DESTINATION ${CMAKE_BINARY_DIR}/bin)
+
+
+# build snmalloc
+#set(SNMALLOC_OPTIMISE_FOR_CURRENT_MACHINE ON CACHE BOOL "optomize for the current computer")
+add_subdirectory(snmalloc)
+install(TARGETS snmallocshim DESTINATION ${CMAKE_BINARY_DIR}/bin)

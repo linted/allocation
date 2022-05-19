@@ -16,3 +16,6 @@
 [submodule "deps/dlmalloc"]
 	path = deps/dlmalloc
 	url = git@github.com:ARMmbed/dlmalloc.git
+[submodule "deps/snmalloc"]
+	path = deps/snmalloc
+	url = https://github.com/microsoft/snmalloc.git
