@@ -18,7 +18,7 @@ The following programs are required to build this project
 git submodule update --init --recursive
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(pwd)/bin
 make
 make install
 ```
@@ -38,7 +38,21 @@ cd build/bin
 ./run_tests.sh
 ```
 
+## Install dependencies for graph generation
+```
+python3 -m virtualenv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+```
+
 ## Display results
+From the build directory, and after run_tests.sh
 ```
 ./code/graph.py light_usage_test.results -g 'small' 'large' 'struct' 'recursive'
+```
+
+## Create graphs for pdf
+```
+mkdir graphs
+./bin/create_graphs.sh bin/ output/ graphs
 ```

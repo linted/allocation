@@ -109,10 +109,7 @@ Stack and Heap Allocations: A Cost Comparison
 }
 
 
-\author{Michael D. Merrill$^{1}$% <-this % stops a space
-\thanks{$^{1}$Michael is a Masters student in Computer Sciences, Georgia Tech,
-and a developer for the  }%
-}
+\author{Michael D. Merrill$^{1}$}
 
 % \widowpenalties 1 10000
 % \raggedbottom
@@ -140,13 +137,13 @@ The source code is publicly available at \url{\GitHubLoc}.
 \section{INTRODUCTION}
 
 Allocation algorithms are designed to limit the overhead related to memory management.
-The most common design goals include considerations for computational expenses, effectiveness allocation size, and to provide discrete blocks of memory. 
+The most common design goals include considerations for computational expenses, fragmentation avoidance, and providing discrete blocks of memory. 
 Stack allocation on commonly used architectures, such as Intel x86, involve changing the value of a register to allocate additional space, and are thus standardized by the architecture.
 Dynamic allocation, in contrast, is defined by userspace libraries.
-This allows for multiple implementations of allocators, as well as specialized allocators which offer increased performance benefits for their use cases. 
+This allows for multiple implementations of allocators, as well as specialized allocators which offer increased performance benefits for their intended use cases. 
 
-This paper addresses the performance costs incurred through the use of the stack and heap across their various allocation methods. 
-A number of test algorithms will be used as measurements. 
+This paper addresses the performance costs incurred through the use of the stack and heap across various allocation methods. 
+A number of test algorithms are used as measurements. 
 Each will attempt to measure a discrete feature and function common to all allocation algorithms. 
 Care is taken to ensure that tests do not favor one method over another through intentional use of compiler hints and directives. 
 The test algorithms are designed to mimic common, real world use cases of allocated memory as well as the academic and theoretical maximums of each allocation type. 
@@ -155,26 +152,25 @@ The test algorithms are designed to mimic common, real world use cases of alloca
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Algorithms}
 
-Algorithm \ref{light_usage_algorithm} is designed to test the baseline performance of the allocator.
+\hyperref[light_usage_algorithm]{Algorithm \ref*{light_usage_algorithm}} is designed to test the baseline performance of the allocator.
 Memory of size $S$ is allocated and stored in the variable $M$.
 A constant value $C$ is then stored at an arbitrary location within the allocated memory, $M_\text{R}$.
 Finally, the memory is deallocated and released to be used by the next iteration or another part of the overall program.
 This is continued until the test is finished; a time determined by the experiment implementation.
 
 \begin{algorithm}[h]
-\caption{Allocation with Light Usage}
-\begin{algorithmic}
-
-\WHILE{test is not finished}
-  \STATE $M \leftarrow allocate(S)$
-  \STATE $M_\text{R} \leftarrow C$
-  \STATE $deallocate(M)$
-\ENDWHILE
-\end{algorithmic}
-\label{light_usage_algorithm}
+  \caption{Allocation with Light Usage}
+  \label{light_usage_algorithm}
+  \begin{algorithmic}
+    \WHILE{test is not finished}
+      \STATE $M \leftarrow allocate(S)$
+      \STATE $M_\text{R} \leftarrow C$
+      \STATE $deallocate(M)$
+    \ENDWHILE
+  \end{algorithmic}
 \end{algorithm}
 
-Algorithm \ref{struct_usage_algorithm}, in a method similar to algorithm \ref{light_usage_algorithm}, begins by allocating memory and storing it into $M$.
+\hyperref[struct_usage_algorithm]{Algorithm \ref*{struct_usage_algorithm}}, in a method similar to \hyperref[light_usage_algorithm]{algorithm \ref*{light_usage_algorithm}}, begins by allocating memory and storing it into $M$.
 In this case $M$ is considered to be a \textbf{C} style structure or similar object of size $S$. 
 All of the members within $M$ are filled with appropriate data, simulating common usage of low level structures.
 After the structure is populated, the deallocation method is used to free the memory.
@@ -182,6 +178,7 @@ Once again, the algorithm loops until a stop condition is met.
 
 \begin{algorithm}[h]
   \caption{Allocation and Initialization of Data Structure}
+  \label{struct_usage_algorithm}
   \begin{algorithmic}
     \WHILE{test is not finished}
       \STATE $M \leftarrow allocate(S)$
@@ -191,10 +188,9 @@ Once again, the algorithm loops until a stop condition is met.
       \STATE $deallocate(M)$
     \ENDWHILE
   \end{algorithmic}
-\label{struct_usage_algorithm}
 \end{algorithm}
 
-One of the most common usages of allocated memory is in network operations, which Algorithm \ref{network_usage_algorithm}, attempts to capture.
+One of the most common usages of allocated memory is in network operations, which \hyperref[network_usage_algorithm]{Algorithm \ref*{network_usage_algorithm}}, attempts to capture.
 In a setup phase, prior to starting the benchmarked portion, a connection to a server is established.
 During the benchmark loop, memory of size $S$ is allocated and stored in $M$.
 Up to $C$ bytes are read from the server into the allocated memory at $M$.
@@ -203,22 +199,22 @@ The loop continues until the test is finished, and the socket is closed.
 
 \begin{algorithm}[h]
   \caption{Allocation with Network Usage}
+  \label{network_usage_algorithm}
   \begin{algorithmic}
-    \STATE $C \leftarrow open()$
+    \STATE $open()$
     \WHILE{test is not finished}
       \STATE $M \leftarrow allocate(S)$
       \STATE $M_\text{R} \leftarrow read(C)$
       \STATE $deallocate(M)$
     \ENDWHILE
-    \STATE $close(C)$
+    \STATE $close()$
   \end{algorithmic}
-  \label{network_usage_algorithm}
 \end{algorithm}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment Methodologies}
-Google's open source Benchmark library is a ``microbenchmark'' framework developed using the Google Test suite.
+Google's open source Benchmark library is a \textit{``microbenchmark''} framework developed using the Google Test suite.
 Benchmark provides a comprehensive environment to gauge code snippet performance with an independent and repeatable approach.
 Each benchmark handler is written in \textbf{C++} and handles the test setup and teardown functionality.
 The portion of code which is being evaluated is written in \textbf{C} to minimize overhead associated with higher level languages, and to produce binary output which is verifiably identical to the associated algorithms.
@@ -231,7 +227,7 @@ Care is taken when discussing test results to ensure comparisons are conducted o
 The tests are measured using various allocation sizes.
 These sizes include \textit{32, 256, 4096, 32768} bytes referred to as small, medium, large, and Huge respectively.
 For each experiment the set of tests are also evaluated across multiple dynamic allocation implementations.
-The set of allocators include \textit{glibc, ptmalloc, jemalloc,} and \textit{tcmalloc}. %and \textit{hoard}.
+The set of allocators include \textit{glibc, ptmalloc, jemalloc, tcmalloc} and \textit{snmalloc}. %and \textit{hoard}.
 This cross section of commonly used general purpose allocators are run independently through dynamic loading.
 
 In order to evaluate each algorithm in multithreaded environments, each test is run with a number of concurrent threads.
@@ -239,37 +235,37 @@ Each test is initially run in a threadless environment for every baseline execut
 After the tests have been completed singly threaded, a multithreaded set of tests is run.
 These tests include running each algorithm with 1, 2, 4, and 8 threads to compare performance.
 
-All experiments are run on a dedicated VPS with $4 \times 2693.67$ MHz CPUs and $8$GB of ram.
-The results shown are the average completion time or throughput of an algorithm after being run for 20 iterations with a minimum of 1 second per iteration.
+All experiments were run in a virtual machine with $4 \times 3700$ MHz CPUs and $8$GB of ram.
+The results shown are the average completion time or throughput of an algorithm after being run for 50 iterations with a minimum of 1 second per iteration.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experiment: Algorithm \ref{light_usage_algorithm}}
-In order to obtain a baseline benchmark of allocation times, Algorithm \ref{light_usage_algorithm} is used with the various sizes of $S$.
-Fig. \ref{algo1_complete_hist} shows a comparison of the relative speed differences across the six allocation libraries.
+\section{Experiment: Algorithm \ref*{light_usage_algorithm}}
+In order to obtain a baseline benchmark of allocation times, \hyperref[light_usage_algorithm]{Algorithm \ref*{light_usage_algorithm}} is used with the various sizes of $S$.
+\hyperref[algo1_complete_hist]{Fig. \ref*{algo1_complete_hist}} shows a comparison of the relative speed differences across the seven allocation libraries.
 This figure is specifically highlighting the fastest average completion times across all allocation types.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_hist.png}
-  \caption{ Algo. \ref{light_usage_algorithm}: Comparison of allocation methods in nano seconds }
+  \caption{ \hyperref[light_usage_algorithm]{Algo. \ref*{light_usage_algorithm}}: Comparison of allocation methods in nano seconds }
   \label{algo1_complete_hist}
 \end{figure} 
 
 
-Fig. \ref{algo1_libc.so.6_bar} shows a better comparison of allocation times by organizing the results of a single library by allocation size.
+\hyperref[algo1_libc.so.6_bar]{Fig. \ref*{algo1_libc.so.6_bar}} shows a better comparison of allocation times by organizing the results of a single library by allocation size.
 From the speed comparison for libc.so.6, it becomes evident that calloc is generally the slowest and normal stack allocation is a constant speed across all allocation sizes.
 This figure also shows the progressive time increases that both calloc and initialized stack allocations go through as the allocation size increases.
 It should also be noted that malloc and uninitialized stack allocations have relatively fixed performance costs, despite a small speed decrease in malloc when the size changes from medium to large.
 
 \begin{figure}[tbh!]
   \centering
-  \includegraphics[width=\columnwidth]{{graphs/light_libc.so.6_1s_20}.png} %stupid .'s in file names
-  \caption{ Algo. \ref{light_usage_algorithm}: Performance differences in libc.so.6 between allocation methods at various sizes }
+  \includegraphics[width=\columnwidth]{{graphs/light_libc.so.6_1s_50}.png} %stupid .'s in file names
+  \caption{ \hyperref[light_usage_algorithm]{Algo. \ref{light_usage_algorithm}}: Performance differences in libc.so.6 between allocation methods at various sizes }
   \label{algo1_libc.so.6_bar}
 \end{figure} 
 
-Algorithm \ref{light_usage_algorithm} has consistent performance across all allocation sizes when allocating on the stack.
-Fig. \ref{algo1_stack_malloc_hist} shows a relative comparison between stack allocation and the efficiency of malloc.
+\hyperref[light_usage_algorithm]{Algorithm \ref*{light_usage_algorithm}} has consistent performance across all allocation sizes when allocating on the stack.
+\hyperref[algo1_stack_malloc_hist]{Fig. \ref{algo1_stack_malloc_hist}} shows a relative comparison between stack allocation and the efficiency of malloc.
 From this figure, the performance of malloc across allocation libraries is shown to vary greatly depending on the size of the allocation.
 For most allocation libraries, the difference in performance between stack and malloc allocation is minimal, however some allocation libraries have slightly higher performance costs then others.
 
@@ -280,24 +276,24 @@ Use of bins keeps allocation times relatively constant since previously allocate
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_stack_malloc_hist.png}
-  \caption{ Algo. \ref{light_usage_algorithm}: Stack and Malloc execution times } 
+  \caption{ \hyperref[light_usage_algorithm]{Algo. \ref*{light_usage_algorithm}}: Stack and Malloc execution times } 
   \label{algo1_stack_malloc_hist}
 \end{figure}
 
 The difference in performance between initialization stack allocation and calloc is the time of uninitialized allocation plus the cost of initialization.
-However, looking at Fig. \ref{algo1_libc.so.6_bar} initialized stack allocation does not appear to be following this rule.
+However, looking at \hyperref[algo1_libc.so.6_bar]{Fig. \ref{algo1_libc.so.6_bar}} initialized stack allocation does not appear to be following this rule.
 This is due to the compiler optimizations which perform loop unwinding during initialization of the stack.
-Loop unwinding for reasonably small allocations can be performed with a store of $0$ using an MMX register or other sufficiently large register, as seen in Fig. \ref{algo1_init_small_lst}.
+Loop unwinding for reasonably small allocations can be performed with a store of $0$ using an MMX register or other sufficiently large register, as seen in \hyperref[algo1_init_small_lst]{Fig. \ref*{algo1_init_small_lst}}.
 This is what allows initialized stack allocation for small allocations to perform on par with uninitialized stack allocations in the small allocation tests.
 
-Applying the idea of loop unwinding to calloc however does not work, as see in Fig. \ref{algo1_init_calloc_hist}.
+Applying the idea of loop unwinding to calloc however does not work, as seen in \hyperref[algo1_init_calloc_hist]{Fig. \ref*{algo1_init_calloc_hist}}.
 Since calloc is an external library, it is unable to benefit from the compiler optimizations that the initialized stack allocation does.
 The main reason for this is that calloc is written in such a way so as to allow for general purpose allocation, and can therefore accommodate any size of allocation with a single function.
-Loop unwinding requires knowledge of the size of the allocation so as to unwind the appropriate number of times without overrunning or underrunning the buffer. 
+Loop unwinding requires knowledge of the size of the allocation at compile time so as to unwind the appropriate number of times without overrunning or underrunning the buffer. 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_init_calloc_hist.png}
-  \caption{ Algo. \ref{light_usage_algorithm}: Initialized Stack and Calloc execution times }
+  \caption{ \hyperref[light_usage_algorithm]{Algo. \ref{light_usage_algorithm}}: Initialized Stack and Calloc execution times }
   \label{algo1_init_calloc_hist}
 \end{figure} 
 
@@ -320,8 +316,8 @@ Loop unwinding requires knowledge of the size of the allocation so as to unwind 
 
 
 Multithreaded execution is known to have a major role in a program's performance, both positively and negatively.
-Fig. \ref{algo1_stack_malloc_threaded_hist} shows how stack and malloc allocations perform while being executed in a multithreaded environment.
-Comparing this figure with Fig. \ref{algo1_complete_hist}, it becomes apparent that while stack allocation speeds remain relatively consistent, malloc can suffer performance loss due to increased contention.
+\hyperref[algo1_stack_malloc_threaded_hist]{Fig. \ref*{algo1_stack_malloc_threaded_hist}} shows how stack and malloc allocations perform while being executed in a multithreaded environment.
+Comparing this figure with \hyperref[algo1_complete_hist]{Fig. \ref*{algo1_complete_hist}}, it becomes apparent that while stack allocation speeds remain relatively consistent, malloc can suffer performance loss due to increased contention.
 However, most libraries remain performant when allocating small and medium sized chunks even at high thread counts.
 It should also be noted that the design of this test causes the greatest possible contention in dynamic allocations due to the near constant allocation requests performed by each thread. 
 While many allocation libraries implement countermeasures to combat contention\footnote{\href{https://sourceware.org/glibc/wiki/MallocInternals\#Thread\_Local\_Cache\_.28tcache.29}{glibc thread local caches}}, there is still additional overhead which must be accounted for.
@@ -329,36 +325,36 @@ While many allocation libraries implement countermeasures to combat contention\f
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_stack_malloc_threaded_hist.png}
-  \caption{ Algo. \ref{light_usage_algorithm}: Comparison of stack and malloc during multithreaded execution }
+  \caption{ \hyperref[light_usage_algorithm]{Algo. \ref*{light_usage_algorithm}}: Comparison of stack and malloc during multithreaded execution }
   \label{algo1_stack_malloc_threaded_hist}
 \end{figure}
 
-Fig. \ref{algo1_init_calloc_threaded_hist} compares initialized stack and calloc allocations in a multithreaded environment, the results are nearly the same as without threads.
+\hyperref[algo1_init_calloc_threaded_hist]{Fig. \ref*{algo1_init_calloc_threaded_hist}} compares initialized stack and calloc allocations in a multithreaded environment, the results are nearly the same as without threads.
 There is nearly identical performance across every library, thread count, and allocation.
 This shows that  the act of initializing memory is far more costly then performance loss due to contention.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/light_init_calloc_threaded_hist.png}
-  \caption{ Algo. \ref{light_usage_algorithm}: comparison of initalized stack and calloc during multithreaded execution }
+  \caption{ \hyperref[light_usage_algorithm]{Algo. \ref{light_usage_algorithm}}: comparison of initalized stack and calloc during multithreaded execution }
   \label{algo1_init_calloc_threaded_hist}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment: Algorithm \ref{struct_usage_algorithm}}
 
-Algo. \ref{struct_usage_algorithm} provides a real world usage example where a struct is allocated and filled with data before being deallocated.
-This differs from Algo. \ref{light_usage_algorithm} in that it accesses every byte of the allocated memory, not only a small subsection.
+\hyperref[struct_usage_algorithm]{Algo. \ref{struct_usage_algorithm}} provides a real world usage example where a struct is allocated and filled with data before being deallocated.
+This differs from \hyperref[light_usage_algorithm]{Algo. \ref*{light_usage_algorithm}} in that it accesses every byte of the allocated memory, not only a small subsection.
 This pattern matches more closely to what would occur in a real program, rather then allocating and not using the memory.
 
-The overall comparisons between each individual allocation type, the trends seen in Algo. \ref{light_usage_algorithm} appear to hold.
-Fig. \ref{algo2_complete_hist} shows similar completion times for stack and malloc as well as with initalized stack and calloc.
-The results are nearly identical to what was seen in the small and medium allocation sizes for \ref{light_usage_algorithm}.
+The overall comparisons between each individual allocation type, the trends seen in \hyperref[light_usage_algorithm]{Algo. \ref*{light_usage_algorithm}} appear to hold.
+\hyperref[algo2_complete_hist]{Fig. \ref{algo2_complete_hist}} shows similar completion times for stack and malloc as well as with initalized stack and calloc.
+The results are nearly identical to what was seen in the small and medium allocation sizes for \hyperref[light_usage_algorithm]{Algo. \ref*{light_usage_algorithm}}.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/struct_hist.png}
-  \caption{ Algo. \ref{struct_usage_algorithm}: Comparison of allocation methods in nano seconds }
+  \caption{ \hyperref[struct_usage_algorithm]{Algo. \ref*{struct_usage_algorithm}}: Comparison of allocation methods in nano seconds }
   \label{algo2_complete_hist}
 \end{figure} 
 
@@ -381,9 +377,9 @@ The results are nearly identical to what was seen in the small and medium alloca
 %   \label{algo2_init_calloc_hist}
 % \end{figure} 
 
-When comparing allocation times in Algo. \ref{light_usage_algorithm}, it was noted that there was a slight decrease in contention due to the time spent on intializing memory.
+When comparing allocation times in \hyperref[light_usage_algorithm]{Algo. \ref{light_usage_algorithm}}, it was noted that there was a slight decrease in contention due to the time spent on intializing memory.
 Carrying this idea over, it is expected that, since every byte is being written to, there should be lower latency.
-In Fig. \ref{algo2_complete_threaded_hist}, this can be seen by overall faster average allocation speeds across all thread counts.
+In \hyperref[algo2_complete_threaded_hist]{Fig. \ref{algo2_complete_threaded_hist}}, this can be seen by overall faster average allocation speeds across all thread counts.
 
 \begin{figure}[tbh!]
   \centering
@@ -393,38 +389,38 @@ In Fig. \ref{algo2_complete_threaded_hist}, this can be seen by overall faster a
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experiment: Algorithm \ref{network_usage_algorithm}}
+\section{Experiment: Algorithm \ref*{network_usage_algorithm}}
 
-While Algo. \ref{struct_usage_algorithm}'s struct usage is the natural progression from towards real world usage after Algo. \ref{light_usage_algorithm}, there is still room for improvement.
+While \hyperref[struct_usage_algorithm]{Algo. \ref*{struct_usage_algorithm}'s} struct usage is the natural progression from towards real world usage after \hyperref[light_usage_algorithm]{Algo. \ref{light_usage_algorithm}}, there is still room for improvement.
 Most small allocations are used to create structs or similar data structures, whereas large allocations are generally used in I/O operations.
-Therefore Algo \ref{network_usage_algorithm} simulates network usage by reading as much as possible from a socket into an allocated buffer.
+Therefore \hyperref[network_usage_algorithm]{Algo \ref*{network_usage_algorithm}} simulates network usage by reading as much as possible from a socket into an allocated buffer.
 This test is implemented by running a local \textbf{ncat} server which executes off a new instance of the \textbf{yes} linux program whenever it receives a new connection.
 
 The results of this experiment show interesting results which may come as a surprise compared to previous experiments.
-Fig. \ref{algo3_complete_hist} shows how larger allocation sizes, even if they are slower to allocate, have significantly higher throughput during network operations.
+\hyperref[algo3_complete_hist]{Fig. \ref*{algo3_complete_hist}} shows how larger allocation sizes, even if they are slower to allocate, have significantly higher throughput during network operations.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_hist.png}
-  \caption{ Algo \ref{network_usage_algorithm}: Comparison of network transfer speed across allocation types. results in Billion Bytes per Second. }
+  \caption{ \hyperref[network_usage_algorithm]{Algo \ref{network_usage_algorithm}}: Comparison of network transfer speed across allocation types. results in Billion Bytes per Second. }
   \label{algo3_complete_hist}
 \end{figure}
 
-Similarly when Algo \ref{network_usage_algorithm} is run in parallel threads, we see increased throughput for larger allocation sizes.
-The increased allocation latency that has been seen in Algo. \ref{light_usage_algorithm}, becomes irrelevant when compared to the speed of network operations.
-Another interesting point of note in Fig. \ref{algo3_complete_threaded_hist} is the decrease in throughput as the threadcount increases.
+Similarly when \hyperref[network_usage_algorithm]{Algo \ref*{network_usage_algorithm}} is run in parallel threads, we see increased throughput for larger allocation sizes.
+The increased allocation latency that has been seen in \hyperref[light_usage_algorithm]{Algo. \ref*{light_usage_algorithm}}, becomes irrelevant when compared to the speed of network operations.
+Another interesting point of note in \hyperref[algo3_complete_threaded_hist]{Fig. \ref*{algo3_complete_threaded_hist}} is the decrease in throughput as the threadcount increases.
 This tends to affect all allocation types equally, and is due to kernel overheads involved with the volume of network traffic being generated and consumed.
 
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_threaded_hist.png}
-  \caption{ Algo \ref{network_usage_algorithm}: Network throughput in threaded environment}
+  \caption{ \hyperref[network_usage_algorithm]{Algo \ref{network_usage_algorithm}}: Network throughput in threaded environment}
   \label{algo3_complete_threaded_hist}
 \end{figure}
 
 \pagebreak
-Looking specifically at stack and malloc allocation in Fig. \ref{algo3_stack_malloc_hist}, there is minimal difference between the two within the allocation sizes.
-Similarly initialized stack and calloc have network through puts across the allocation sizes in Fig. \ref{algo3_init_calloc_hist}.
+Looking specifically at stack and malloc allocation in \hyperref[algo3_stack_malloc_hist]{Fig. \ref{algo3_stack_malloc_hist}}, there is minimal difference between the two within the allocation sizes.
+Similarly initialized stack and calloc have network through puts across the allocation sizes in \hyperref[algo3_init_calloc_hist]{Fig. \ref{algo3_init_calloc_hist}}.
 This reinforces that the speed of the allocation pales in comparison to how it is being used.
 
 \begin{figure}[tbh!]
@@ -437,7 +433,7 @@ This reinforces that the speed of the allocation pales in comparison to how it i
 \begin{figure}[tbh!]
   \centering
   \includegraphics[width=\columnwidth]{graphs/sporatic_init_calloc_hist.png}
-  \caption{ Algo \ref{network_usage_algorithm}: initalized stack and calloc network throughput comparison }
+  \caption{ \hyperref[network_usage_algorithm]{Algo \ref{network_usage_algorithm}}: initalized stack and calloc network throughput comparison }
   \label{algo3_init_calloc_hist}
 \end{figure}
 
@@ -447,9 +443,9 @@ This reinforces that the speed of the allocation pales in comparison to how it i
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
-The empirical latency of allocation operations was shown in Algo. \ref{light_usage_algorithm}.
-With Algo. \ref{struct_usage_algorithm} the short term simple usage of memory was put on display.
-Finally in Algo. \ref{network_usage_algorithm}, a comparison of allocation speed and IO operations was presented.
+The empirical latency of allocation operations was shown in \hyperref[light_usage_algorithm]{Algo. \ref*{light_usage_algorithm}}.
+With \hyperref[struct_usage_algorithm]{Algo. \ref*{struct_usage_algorithm}} the short term simple usage of memory was put on display.
+Finally in \hyperref[network_usage_algorithm]{Algo. \ref*{network_usage_algorithm}}, a comparison of allocation speed and IO operations was presented.
 
 With all this data, there are a few conclusions which can be drawn.
 To begin, malloc and calloc are empirically slower then stack and initalized stack allocations.
