@@ -35,7 +35,6 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DNO_DOCS=true
 ## Run all tests and generate data
 ```
 cd build/bin
-ncat -knlp 4000 -e /bin/yes &
 ./run_tests.sh
 ```
 
